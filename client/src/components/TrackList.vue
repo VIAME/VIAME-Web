@@ -27,6 +27,10 @@ interface VirtualListItem {
 }
 
 export default defineComponent({
+  name: 'TrackList',
+
+  components: { TrackItem },
+
   props: {
     newTrackMode: {
       type: String,
@@ -49,8 +53,6 @@ export default defineComponent({
       default: 420,
     },
   },
-
-  components: { TrackItem },
 
   setup(props, { root }) {
     const prompt = root.$prompt;

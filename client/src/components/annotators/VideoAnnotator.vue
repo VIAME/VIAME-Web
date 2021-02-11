@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from '@vue/composition-api';
+import { Flick } from './mediaControllerType';
 import useMediaController from './useMediaController';
 
 export default defineComponent({
@@ -20,8 +21,8 @@ export default defineComponent({
     },
   },
 
-  setup(props, { emit }) {
-    const commonMedia = useMediaController({ emit });
+  setup(props) {
+    const commonMedia = useMediaController({ hasFlicks: true });
     const { data } = commonMedia;
 
     function makeVideo() {
@@ -35,8 +36,12 @@ export default defineComponent({
 
     function syncWithVideo() {
       if (data.playing) {
-        data.frame = Math.round(video.currentTime * props.frameRate);
-        data.syncedFrame = data.frame;
+        const newFrame = Math.round(video.currentTime * props.frameRate);
+        if (newFrame !== data.frame) {
+          data.frame = newFrame;
+          data.syncedFrame = newFrame;
+        }
+        data.flick = Math.round(video.currentTime * Flick);
         commonMedia.geoViewerRef.value.scheduleAnimationFrame(syncWithVideo);
       }
     }
@@ -51,10 +56,16 @@ export default defineComponent({
       }
     }
 
+    /**
+     * VideoAnnotator emits frame changes immediately rather than
+     * waiting for video buffering to catch up.
+     */
     async function seek(frame: number) {
       video.currentTime = frame / props.frameRate;
+      // forge inaccurate flick from requested seek time.
+      // it will be corrected when the seeked event is fired.
+      data.flick = Math.round((frame / props.frameRate) * Flick);
       data.frame = Math.round(video.currentTime * props.frameRate);
-      commonMedia.emitFrame();
     }
 
     function pause() {
@@ -98,7 +109,12 @@ export default defineComponent({
     }
 
     function pendingUpdate() {
-      data.syncedFrame = Math.round(video.currentTime * props.frameRate);
+      const syncedFrame = Math.round(video.currentTime * props.frameRate);
+      // Don't update syncedFrame until state settles.
+      if (data.frame === syncedFrame) {
+        data.syncedFrame = syncedFrame;
+        data.flick = Math.round(video.currentTime * Flick);
+      }
     }
 
     video.addEventListener('loadedmetadata', loadedMetadata);

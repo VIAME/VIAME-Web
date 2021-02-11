@@ -29,7 +29,6 @@ interface SetAnnotationStateArgs {
 export default function useModeManager({
   selectedTrackId,
   editingTrack,
-  frame,
   trackMap,
   mediaController,
   newTrackSettings,
@@ -41,14 +40,13 @@ export default function useModeManager({
 }: {
   selectedTrackId: Ref<TrackId | null>;
   editingTrack: Ref<boolean>;
-  frame: Ref<number>;
   trackMap: Map<TrackId, Track>;
   mediaController: Ref<MediaController>;
   newTrackSettings: NewTrackSettings;
   recipes: Recipe[];
   selectTrack: (trackId: TrackId | null, edit: boolean) => void;
   selectNextTrack: (delta?: number) => TrackId | null;
-  addTrack: (frame: number, defaultType: string) => Track;
+  addTrack: (frame: number, defaultType: string, hasFlicks: Readonly<boolean>) => Track;
   removeTrack: (trackId: TrackId) => void;
 }) {
   let creating = false;
@@ -89,9 +87,9 @@ export default function useModeManager({
 
   function seekNearest(track: Track) {
     // Seek to the nearest point in the track.
-    if (frame.value < track.begin) {
+    if (mediaController.value.frame.value < track.begin) {
       mediaController.value.seek(track.begin);
-    } else if (frame.value > track.end) {
+    } else if (mediaController.value.frame.value > track.end) {
       mediaController.value.seek(track.end);
     }
   }
@@ -134,8 +132,9 @@ export default function useModeManager({
   }
 
   function handleAddTrackOrDetection(): TrackId {
+    const { hasFlicks, frame } = mediaController.value;
     // Handles adding a new track with the NewTrack Settings
-    const newTrackId = addTrack(frame.value, newTrackSettings.type).trackId;
+    const newTrackId = addTrack(frame.value, newTrackSettings.type, hasFlicks).trackId;
     selectTrack(newTrackId, true);
     creating = true;
     return newTrackId;
@@ -168,7 +167,11 @@ export default function useModeManager({
     creating = newCreatingValue;
   }
 
-  function handleUpdateRectBounds(frameNum: number, bounds: RectBounds) {
+  function handleUpdateRectBounds(
+    frameNum: number,
+    flick: number | undefined,
+    bounds: RectBounds,
+  ) {
     if (selectedTrackId.value !== null) {
       const track = trackMap.get(selectedTrackId.value);
       if (track) {
@@ -177,6 +180,7 @@ export default function useModeManager({
 
         track.setFeature({
           frame: frameNum,
+          flick,
           bounds,
           keyframe: true,
           interpolate: _shouldInterpolate(interpolate),
@@ -189,6 +193,7 @@ export default function useModeManager({
   function handleUpdateGeoJSON(
     eventType: 'in-progress' | 'editing',
     frameNum: number,
+    flick: number | undefined,
     // Type alias this
     data: SupportedFeature,
     key?: string,
@@ -280,6 +285,7 @@ export default function useModeManager({
         if (somethingChanged) {
           track.setFeature({
             frame: frameNum,
+            flick,
             keyframe: true,
             bounds: updateBounds(real?.bounds, update.union, update.unionWithoutBounds),
             interpolate,
@@ -313,7 +319,7 @@ export default function useModeManager({
         recipes.forEach((r) => {
           if (r.active.value) {
             r.deletePoint(
-              frame.value,
+              mediaController.value.frame.value,
               track,
               selectedFeatureHandle.value,
               selectedKey.value,
@@ -333,7 +339,9 @@ export default function useModeManager({
       if (track) {
         recipes.forEach((r) => {
           if (r.active.value) {
-            r.delete(frame.value, track, selectedKey.value, annotationModes.editing);
+            r.delete(
+              mediaController.value.frame.value, track, selectedKey.value, annotationModes.editing,
+            );
           }
         });
       }

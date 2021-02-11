@@ -53,6 +53,7 @@ export default defineComponent({
 
     const annotator = injectMediaController();
     const frameNumberRef = annotator.frame;
+    const flickRef = annotator.flick;
 
     const rectAnnotationLayer = new RectangleLayer({
       annotator,
@@ -102,7 +103,6 @@ export default defineComponent({
       const currentFrameIds: TrackId[] = intervalTree
         .search([frame, frame])
         .map((str: string) => parseInt(str, 10));
-
       const frameData = [] as FrameDataTrack[];
       const editingTracks = [] as FrameDataTrack[];
       currentFrameIds.forEach(
@@ -171,7 +171,7 @@ export default defineComponent({
           editingTracks.push(trackFrame);
         }
         if (editingTracks.length) {
-          if (editingTrack && !editAnnotationLayer.creationIncomplete()) {
+          if (editingTrack) {
             editAnnotationLayer.setType(editingTrack);
             editAnnotationLayer.setKey(selectedKey);
             editAnnotationLayer.changeData(editingTracks);
@@ -246,9 +246,9 @@ export default defineComponent({
       if (type === 'rectangle') {
         const bounds = geojsonToBound(data as GeoJSON.Feature<GeoJSON.Polygon>);
         cb();
-        handler.updateRectBounds(frameNumberRef.value, bounds);
+        handler.updateRectBounds(frameNumberRef.value, flickRef.value, bounds);
       } else {
-        handler.updateGeoJSON(mode, frameNumberRef.value, data, key, cb);
+        handler.updateGeoJSON(mode, frameNumberRef.value, flickRef.value, data, key, cb);
       }
       // Jump into edit mode if we completed a new shape
       if (geometryCompleteEvent) {

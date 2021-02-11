@@ -20,6 +20,7 @@ export interface StringKeyObject {
 /* Frame feature for both TrackData and Track */
 export interface Feature {
   frame: number;
+  flick?: number;
   interpolate?: boolean;
   keyframe?: boolean;
   bounds?: RectBounds;
@@ -49,6 +50,7 @@ interface TrackParams {
   features?: Array<Feature>;
   confidencePairs?: Array<ConfidencePair>;
   attributes?: StringKeyObject;
+  hasFlicks?: boolean;
 }
 
 /**
@@ -77,6 +79,13 @@ export default class Track {
   end: number;
 
   /**
+   * whether or not the track uses flicks for time.
+   * either all features have a flick, or none of them should.
+   * Track will enforce this
+   */
+  hasFlicks: boolean;
+
+  /**
    * Be very careful with revision!  It is expensive to use,
    * and should only be used for reactivity on a single track
    * rather than within the context of a loop.
@@ -92,6 +101,7 @@ export default class Track {
     features = [],
     confidencePairs = [],
     attributes = {},
+    hasFlicks = false,
   }: TrackParams) {
     this.bus = new Vue();
     this.trackId = trackId;
@@ -100,6 +110,7 @@ export default class Track {
     this.features = features; // NON-reactive sparse array
     this.featureIndex = [];
     this.revision = ref(1);
+    this.hasFlicks = hasFlicks;
     Track.sanityCheckFeatures(features);
     this.repopulateInterpolatedFrames(features);
     this.begin = begin;
@@ -259,11 +270,20 @@ export default class Track {
         Math.round(feature.bounds[3]),
       ];
     }
+    if (this.hasFlicks !== (typeof feature.flick === 'number')) {
+      throw new Error(
+        'feature must always have flick if track.hasFlicks is true, must be undefined if false',
+      );
+    }
     if (!this.features[feature.frame].keyframe) {
-      throw new Error('setFeature must be called with keyframe=true OR to update an existing keyframe');
+      throw new Error(
+        'setFeature must be called with keyframe=true OR to update an existing keyframe',
+      );
     }
     listInsert(this.featureIndex, feature.frame);
-    const fg = this.features[feature.frame].geometry || { type: 'FeatureCollection', features: [] };
+    const fg = this.features[feature.frame].geometry || {
+      type: 'FeatureCollection', features: [],
+    };
     geometry.forEach((geo) => {
       const i = fg.features
         .findIndex((item) => {
@@ -450,16 +470,21 @@ export default class Track {
     if (b === 0 || a === 0) {
       keyframe = true; // actually this is a keyframe
     }
-    let box;
+    let box: RectBounds | undefined;
+    let flick: number | undefined;
     if (d0.bounds && d1.bounds) {
       const d0bounds = d0.bounds;
       const d1bounds = d1.bounds;
-      box = d0bounds.map((_, i) => ((d0bounds[i] * a) + (d1bounds[i] * b)));
+      box = d0bounds.map((_, i) => ((d0bounds[i] * a) + (d1bounds[i] * b))) as RectBounds;
+      if (d0.flick !== undefined && d1.flick !== undefined) {
+        flick = (a * d0.flick) + (b * d1.flick);
+      }
     } else {
       throw new Error('Bounds cannot be missing from interpolated features');
     }
     return {
       frame,
+      flick,
       bounds: [box[0], box[1], box[2], box[3]],
       interpolate: true,
       keyframe,
@@ -467,13 +492,26 @@ export default class Track {
   }
 
   static fromJSON(json: TrackData): Track {
+    let trackHasFlicks: boolean | undefined;
     const sparseFeatures: Array<Feature> = [];
     json.features.forEach((f) => {
+      const featureHasFlick = (typeof f.flick === 'number');
+      /* Initialize hasFlicks based on the presence of flick on feature 0 */
+      if (trackHasFlicks === undefined) {
+        trackHasFlicks = featureHasFlick;
+      }
+      /* If any future feature is different from the first, panic */
+      if (trackHasFlicks !== featureHasFlick) {
+        throw new Error('Either all features in a track have flicks, or none do');
+      }
       sparseFeatures[f.frame] = {
-        keyframe: true,
         ...f,
+        keyframe: true,
       };
     });
+    if (trackHasFlicks === undefined) {
+      throw new Error('no features in track');
+    }
     // accept either number or string, convert to number
     const intTrackId = parseInt(json.trackId.toString(), 10);
     const track = new Track(intTrackId, {
@@ -483,6 +521,7 @@ export default class Track {
       confidencePairs: json.confidencePairs,
       begin: json.begin,
       end: json.end,
+      hasFlicks: trackHasFlicks,
     });
     return track;
   }

@@ -59,7 +59,11 @@ export default defineComponent({
       inputError: false,
     });
 
-    /* Use of revision is safe because it will only create a dependency when track is selected */
+    /**
+     * Use of revision is safe because it will only create a
+     * dependency when track is selected.  DO NOT use this computed
+     * value except inside if (props.selected === true) blocks!
+     */
     const feature = computed(() => {
       if (props.track.revision.value) {
         const { features, interpolate } = props.track.canInterpolate(frameRef.value);
@@ -84,7 +88,11 @@ export default defineComponent({
     });
 
     /* isTrack distinguishes between track and detection */
-    const isTrack = computed(() => props.track.length > 1 || feature.value.shouldInterpolate);
+    const isTrack = computed(() => (
+      props.track.length > 1
+      || (props.track.features.length === 1
+          && props.track.features[0].interpolate)
+    ));
 
     /* Sets styling for the selected track */
     const style = computed(() => {
@@ -114,7 +122,7 @@ export default defineComponent({
     }
 
     function onBlur(e: KeyboardEvent) {
-      if (data.trackTypeValue.trim() === '') {
+      if (data.trackTypeValue === '') {
         data.trackTypeValue = props.trackType;
       } else if (data.trackTypeValue !== props.trackType) {
         handler.trackTypeChange(props.track.trackId, data.trackTypeValue);

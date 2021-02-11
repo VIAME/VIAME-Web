@@ -33,17 +33,14 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-    loadImageFunc: {
-      type: Function as PropType<(imageDataItem: ImageDataItem, img: HTMLImageElement) => void>,
-      default: loadImageFunc,
-    },
   },
 
-  setup(props, { emit }) {
+  setup(props) {
     const loadingVideo = ref(false);
     const loadingImage = ref(true);
-    const commonMedia = useMediaController({ emit });
+    const commonMedia = useMediaController();
     const { data } = commonMedia;
+    data.flick = undefined;
     data.maxFrame = props.imageData.length - 1;
 
     // Below are configuration settings we can set until we decide on good numbers to utilize.
@@ -141,7 +138,7 @@ export default defineComponent({
         };
         imgs[i] = newImgInternal;
         pendingImgs.add(newImgInternal);
-        props.loadImageFunc(newImgInternal, img);
+        loadImageFunc(newImgInternal, img);
       }
       return expectFrame(i);
     }
@@ -207,7 +204,6 @@ export default defineComponent({
         return;
       }
 
-      commonMedia.emitFrame();
       cacheImages();
       const imgInternal = expectFrame(newFrame);
       drawImage(imgInternal.image);

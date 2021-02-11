@@ -1,7 +1,6 @@
 // Reference used because of https://github.com/Microsoft/TypeScript/issues/28502
 /// <reference types="resize-observer-browser" />
 import geo from 'geojs';
-import { throttle } from 'lodash';
 import {
   ref, reactive, onMounted, onBeforeUnmount, provide, toRef, Ref,
 } from '@vue/composition-api';
@@ -15,9 +14,7 @@ export function injectMediaController() {
   return use<MediaController>(MediaControllerSymbol);
 }
 
-export default function useMediaController({ emit }: {
-  emit(name: string, val: unknown): void;
-}) {
+export default function useMediaController({ hasFlicks = false } = {}) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const geoViewerRef: Ref<any> = ref(undefined);
   const containerRef: Ref<HTMLElement | undefined> = ref(undefined);
@@ -27,6 +24,7 @@ export default function useMediaController({ emit }: {
     ready: false,
     playing: false,
     frame: 0,
+    flick: undefined as number | undefined,
     filename: '',
     maxFrame: 0,
     syncedFrame: 0,
@@ -40,10 +38,6 @@ export default function useMediaController({ emit }: {
       right: 1,
     },
   });
-
-  const emitFrame = throttle(() => {
-    emit('frame-update', data.frame);
-  }, 200);
 
   function onResize() {
     if (geoViewerRef.value === undefined || containerRef.value === undefined) {
@@ -204,10 +198,13 @@ export default function useMediaController({ emit }: {
       },
     };
 
-    const mediaController = {
+    const mediaController: MediaController = {
       geoViewerRef,
       playing: toRef(data, 'playing'),
       frame: toRef(data, 'frame'),
+      flick: toRef(data, 'flick'),
+      // Non-reactive, can only be set before initialize() is called
+      hasFlicks,
       filename: toRef(data, 'filename'),
       maxFrame: toRef(data, 'maxFrame'),
       syncedFrame: toRef(data, 'syncedFrame'),
@@ -219,7 +216,7 @@ export default function useMediaController({ emit }: {
       resetZoom,
       setCursor,
       setImageCursor,
-    } as MediaController;
+    };
 
     provide(MediaControllerSymbol, mediaController);
 
@@ -233,7 +230,6 @@ export default function useMediaController({ emit }: {
   return {
     containerRef,
     data,
-    emitFrame,
     geoViewerRef,
     imageCursorRef,
     initialize,
