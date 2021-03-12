@@ -6,12 +6,13 @@ import shutil
 import subprocess
 import tempfile
 import zipfile
+import re
 from pathlib import Path
 from subprocess import Popen
 from typing import Dict, List, Optional, Tuple
 from urllib import request
 from urllib.parse import urlparse
-
+from celery.schedules import crontab
 from girder_client import GirderClient
 from girder_worker.app import app
 from girder_worker.task import Task
@@ -33,13 +34,8 @@ EMPTY_JOB_SCHEMA: AvailableJobSchema = {
         'default': None,
     },
 }
-UPGRADE_JOB_DEFAULT_URLS: List[str] = [
-    'https://data.kitware.com/api/v1/item/6011e3452fa25629b91ade60/download',  # Habcam
-    'https://viame.kitware.com/api/v1/item/604859fc5b1737bb9085f5e2/download',  # SEFSC
-    'https://data.kitware.com/api/v1/item/6011ebf72fa25629b91aef03/download',  # PengHead
-    'https://data.kitware.com/api/v1/item/601b00d02fa25629b9391ad6/download',  # Motion
-    'https://data.kitware.com/api/v1/item/601afdde2fa25629b9390c41/download',  # EM Tuna
-]
+# https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
+URL_REGEX = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
 
 
 def get_gpu_environment() -> Dict[str, str]:
@@ -105,7 +101,8 @@ class Config:
 @app.task(bind=True, acks_late=True)
 def upgrade_pipelines(
     self: Task,
-    urls: List[str] = UPGRADE_JOB_DEFAULT_URLS,
+    direct_urls: List[str],
+    manifest_url: Optional[str] = None,
     force: bool = False,
 ):
     """ Install addons from zip files over HTTP """
@@ -115,7 +112,15 @@ def upgrade_pipelines(
     # zipfiles to extract after download is complete
     addons_to_update_update: List[Path] = []
 
-    for idx, addon in enumerate(urls):
+    if manifest_url:
+        with request.urlopen(manifest_url) as req:
+            contents = req.read().decode('utf-8')
+            manager.write(f'--------\n{contents}\n--------\n')
+            for match in re.finditer(URL_REGEX, contents):
+                manager.write(f'Match found: {match.group(0)}\n')
+                direct_urls.append(match.group(0))
+
+    for addon in direct_urls:
         download_name = urlparse(addon).path.replace('/', '_')
         zipfile_path = conf.addon_zip_path / f'{download_name}.zip'
         if not zipfile_path.exists() or force:

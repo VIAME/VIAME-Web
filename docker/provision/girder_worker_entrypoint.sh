@@ -15,4 +15,4 @@ if [ -n "$WORKER_CONCURRENCY" ]; then
     CONCURRENCY_ARGUMENT="--concurrency $WORKER_CONCURRENCY"
 fi
 
-exec python3.7 -m girder_worker -l info $QUEUE_ARGUMENT $CONCURRENCY_ARGUMENT
+exec python3.7 -m girder_worker -l info $QUEUE_ARGUMENT $CONCURRENCY_ARGUMENT ${WORKER_ENABLE_BEAT}

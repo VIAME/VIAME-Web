@@ -14,7 +14,6 @@ from girder.models.user import User
 from girder_jobs.models.job import Job
 
 from dive_tasks.tasks import (
-    UPGRADE_JOB_DEFAULT_URLS,
     convert_images,
     convert_video,
     run_pipeline,
@@ -84,20 +83,31 @@ class Viame(Resource):
             default=False,
             required=False,
         )
+        .param(
+            "manifest_url",
+            "Url to a text file to search for addon URL strings",
+            paramType="query",
+            dataType="string",
+            required=False,
+            default='https://raw.githubusercontent.com/VIAME/VIAME/master/cmake/download_viame_addons.sh',
+        )
         .jsonParam(
-            "urls",
+            "direct_urls",
             "List of public URLs for addon zipfiles",
             paramType='body',
-            requireArray=True,
             required=False,
-            default=UPGRADE_JOB_DEFAULT_URLS,
         )
     )
-    def upgrade_pipelines(self, force: bool, urls: List[str]):
+    def upgrade_pipelines(
+        self, manifest_url: Optional[str], force: bool, direct_urls: Optional[List[str]]
+    ):
+        # girder passes empty dict for empty jsonParam body
+        direct_urls = direct_urls if direct_urls else []
         token = Token().createToken(user=self.getCurrentUser(), days=1)
         Setting().set(SETTINGS_CONST_JOBS_CONFIGS, None)
         upgrade_pipelines.delay(
-            urls=urls,
+            direct_urls=direct_urls,
+            manifest_url=manifest_url,
             force=force,
             girder_job_title="Upgrade Pipelines",
             girder_client_token=str(token["_id"]),
