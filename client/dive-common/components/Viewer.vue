@@ -33,7 +33,8 @@ import UserGuideButton from 'dive-common/components/UserGuideButton.vue';
 import RunPipelineMenu from 'dive-common/components/RunPipelineMenu.vue';
 import DeleteControls from 'dive-common/components/DeleteControls.vue';
 import ControlsContainer from 'dive-common/components/ControlsContainer.vue';
-import Sidebar from 'dive-common/components/Sidebar.vue';
+import SidebarLeft from 'dive-common/components/SidebarLeft.vue';
+import SidebarRight from 'dive-common/components/SidebarRight.vue';
 
 import {
   useModeManager,
@@ -46,7 +47,8 @@ export default defineComponent({
   components: {
     ControlsContainer,
     DeleteControls,
-    Sidebar,
+    SidebarLeft,
+    SidebarRight,
     LayerManager,
     VideoAnnotator,
     ImageAnnotator,
@@ -448,7 +450,7 @@ export default defineComponent({
       class="fill-height"
       style="min-width: 700px;"
     >
-      <sidebar
+      <SidebarLeft
         v-bind="{ newTrackSettings, typeSettings }"
         @update-new-track-settings="updateNewTrackSettings($event)"
         @update-type-settings="updateTypeSettings($event)"
@@ -459,7 +461,7 @@ export default defineComponent({
           :confidence.sync="confidenceThreshold"
           @end="saveThreshold"
         />
-      </sidebar>
+      </SidebarLeft>
       <v-col style="position: relative">
         <component
           :is="datasetType === 'image-sequence' ? 'image-annotator' : 'video-annotator'"
@@ -507,6 +509,9 @@ export default defineComponent({
           </v-progress-circular>
         </div>
       </v-col>
+      <SidebarRight
+        v-bind="{ newTrackSettings, typeSettings }"
+      />
     </v-row>
   </v-main>
 </template>

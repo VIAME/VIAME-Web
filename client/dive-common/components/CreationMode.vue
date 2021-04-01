@@ -68,13 +68,13 @@ export default Vue.extend({
 </script>
 
 <template>
-  <div class="CreationMode mb-2">
+  <div>
     <v-card
       outlined
-      class="pa-2 pb-0 mt-3"
+      class="pa-2"
     >
-      <div class="subheading">
-        New Annotation Settings
+      <div class="settings-header pb-1">
+        Annotation Creation Settings
       </div>
       <v-row
         align="end"
@@ -82,7 +82,7 @@ export default Vue.extend({
       >
         <v-col
           class="mx-2 py-1"
-          cols="2"
+          cols="3"
         >
           Mode:
         </v-col>
@@ -124,7 +124,7 @@ export default Vue.extend({
       >
         <v-col
           class="mx-2 py-1"
-          cols="2"
+          cols="3"
         >
           Type:
         </v-col>

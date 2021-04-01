@@ -18,7 +18,6 @@ import {
 } from 'vue-media-annotator/provides';
 import { getTrack } from 'vue-media-annotator/use/useTrackStore';
 import { Attribute } from 'vue-media-annotator/use/useAttributes';
-import TrackItem from 'vue-media-annotator/components/TrackItem.vue';
 
 import AttributeInput from 'dive-common/components/AttributeInput.vue';
 import AttributeEditor from 'dive-common/components/AttributeEditor.vue';
@@ -29,7 +28,6 @@ import ConfidenceSubsection from 'dive-common/components/ConfidenceSubsection.vu
 export default defineComponent({
   components: {
     AttributeInput,
-    TrackItem,
     AttributeEditor,
     AttributeSubsection,
     ConfidenceSubsection,
@@ -38,10 +36,6 @@ export default defineComponent({
     lockTypes: {
       type: Boolean,
       default: false,
-    },
-    width: {
-      type: Number,
-      default: 300,
     },
     hotkeysDisabled: {
       type: Boolean,
@@ -205,14 +199,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <v-card
+  <div
     ref="card"
     v-mousetrap="mouseTrap"
-    :width="width"
-    class="d-flex flex-column overflow-hidden"
     @click.native="resetEditIndividual"
   >
-    <v-subheader>Track Editor</v-subheader>
     <div
       v-if="!selectedTrack"
       class="ml-4 body-2"
@@ -229,18 +220,6 @@ export default defineComponent({
           {{ type }}
         </option>
       </datalist>
-      <track-item
-        :solo="true"
-        :track="selectedTrack"
-        :track-type="selectedTrack.confidencePairs[0][0]"
-        :selected="true"
-        :editing="!!editingModeRef"
-        :input-value="true"
-        :color="typeStylingRef.color(selectedTrack.confidencePairs[0][0])"
-        :lock-types="lockTypes"
-        @seek="$emit('track-seek', $event)"
-      />
-
       <confidence-subsection
         style="max-height:33vh"
         :confidence-pairs="selectedTrack.confidencePairs"
@@ -277,5 +256,5 @@ export default defineComponent({
         @delete="deleteAttributeHandler"
       />
     </v-dialog>
-  </v-card>
+  </div>
 </template>

@@ -125,7 +125,6 @@ export default defineComponent({
 <template>
   <panel-subsection>
     <template
-      v-if="selectedAttributes"
       slot="header"
     >
       <v-row
@@ -143,6 +142,7 @@ export default defineComponent({
             <v-btn
               outlined
               x-small
+              :disabled="!selectedAttributes"
               v-on="on"
               @click="addAttribute"
             >
@@ -185,14 +185,9 @@ export default defineComponent({
       </v-row>
     </template>
 
-    <template
-      v-if="selectedAttributes"
-      slot="scroll-section"
-    >
+    <template slot="scroll-section">
       <v-col
-        v-if="
-          activeSettings || activeAttributesCount
-        "
+        v-if="selectedAttributes && (activeSettings || activeAttributesCount)"
         class="pa-0"
       >
         <span
@@ -200,11 +195,8 @@ export default defineComponent({
           :key="i"
         >
           <v-row
-            v-if="
-              activeSettings ||
-                selectedAttributes.attributes[attribute.name] !== undefined
-            "
-            class="ma-0"
+            v-if="activeSettings || selectedAttributes.attributes[attribute.name] !== undefined"
+            class="mx-1"
             dense
             align="center"
           >
@@ -263,7 +255,10 @@ export default defineComponent({
         </span>
       </v-col>
       <v-col v-else>
-        <div style="font-size: 0.75em">
+        <div
+          class="pa-2"
+          style="font-size: 0.75em"
+        >
           No {{ mode }} attributes set
         </div>
       </v-col>
