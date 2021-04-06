@@ -15,7 +15,7 @@ from girder.models.upload import Upload
 from pydantic.main import BaseModel
 from pymongo.cursor import Cursor
 
-from dive_server.serializers import viame
+from dive_server.serializers import viame, fishclef
 from dive_utils import asbool, fromMeta, models
 from dive_utils.constants import (
     DatasetMarker,
@@ -123,6 +123,12 @@ def getTrackAndAttributesFromCSV(file: File) -> Tuple[dict, dict]:
             .splitlines()
         )
     return ({}, {})
+
+
+def getTrackAndAttributesFromXML(file: File) -> dict:
+    return fishclef.load_fishclef_xml_as_tracks(
+        b"".join(list(File().download(file, headers=False)())).decode("utf-8")
+    )
 
 
 def saveTracks(folder, tracks, user):

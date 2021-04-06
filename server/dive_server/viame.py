@@ -1,4 +1,5 @@
 from typing import List, Optional
+import xml
 
 import pymongo
 from girder.api import access
@@ -29,6 +30,7 @@ from dive_utils.constants import (
     PublishedMarker,
     TrainedPipelineCategory,
     csvRegex,
+    xmlRegex,
     imageRegex,
     safeImageRegex,
     videoRegex,
@@ -51,6 +53,7 @@ from .utils import (
     get_or_create_auxiliary_folder,
     getCloneRoot,
     getTrackAndAttributesFromCSV,
+    getTrackAndAttributesFromXML,
     move_existing_result_to_auxiliary_folder,
     saveCSVImportAttributes,
     saveTracks,
@@ -388,6 +391,7 @@ class Viame(Resource):
         csvs = [f for f in files if csvRegex.search(f)]
         images = [f for f in files if imageRegex.search(f)]
         ymls = [f for f in files if ymlRegex.search(f)]
+        xmls = [f for f in files if xmlRegex.search(f)]
         if len(videos) and len(images):
             ok = False
             message = "Do not upload images and videos in the same batch."
@@ -415,7 +419,7 @@ class Viame(Resource):
             "message": message,
             "type": mediatype,
             "media": images + videos,
-            "annotations": csvs + ymls,
+            "annotations": csvs + ymls + xmls,
         }
 
     @access.user
@@ -521,6 +525,20 @@ class Viame(Resource):
             saveCSVImportAttributes(folder, attributes, user)
             csvItems.rewind()
             for item in csvItems:
+                Item().move(item, auxiliary)
+
+        # transcode XML if necessary
+        xmlItems = Folder().childItems(
+            folder,
+            filters={"lowerName": {"$regex": xmlRegex}},
+            sort=[("created", pymongo.DESCENDING)],
+        )
+        print(xmlItems)
+        if xmlItems.count() >= 1:
+            file = Item().childFiles(xmlItems.next())[0]
+            tracks = getTrackAndAttributesFromXML(file)
+            saveTracks(folder, tracks, user)
+            for item in xmlItems:
                 Item().move(item, auxiliary)
 
         return folder
