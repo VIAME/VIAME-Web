@@ -16,7 +16,7 @@ import * as common from './common';
 import { jobFileEchoMiddleware, spawnResult } from './utils';
 import {
   getMultiCamImageFiles, getMultiCamVideoPath,
-  getTranscodedMultiCamType, writeMultiCamPipelineInputs,
+  getTranscodedMultiCamType, writeMultiCamStereoPipelineArgs,
 } from './multiCamUtils';
 
 
@@ -63,7 +63,7 @@ async function runPipeline(
   const jobWorkDir = await common.createKwiverRunWorkingDir(settings, [meta], pipeline.name);
 
   const detectorOutput = npath.join(jobWorkDir, 'detector_output.csv');
-  const trackOutput = npath.join(jobWorkDir, 'track_output.csv');
+  let trackOutput = npath.join(jobWorkDir, 'track_output.csv');
   const joblog = npath.join(jobWorkDir, 'runlog.txt');
 
   //TODO: TEMPORARY FIX FOR DEMO PURPOSES
@@ -132,16 +132,22 @@ async function runPipeline(
     command.push(`-s track_reader:file_name="${groundTruthFileName}"`);
   }
 
+  let multiOutFiles: Record<string, string>;
   if (meta.multiCam && pipeline.type === 'measurement') {
-    const inputArgFilePair = writeMultiCamPipelineInputs(jobWorkDir, meta);
-    Object.entries(inputArgFilePair).forEach(([arg, file]) => {
-      command.push(`-s ${arg}:video_filename="${npath.join(jobWorkDir, file)}`);
+    const { argFilePair, outFiles } = writeMultiCamStereoPipelineArgs(jobWorkDir, meta);
+    Object.entries(argFilePair).forEach(([arg, file]) => {
+      command.push(`-s ${arg}="${file}"`);
     });
+    multiOutFiles = {};
+    Object.entries(outFiles).forEach(([key, val]) => {
+      multiOutFiles[key] = npath.join(jobWorkDir, val);
+    });
+    trackOutput = npath.join(jobWorkDir, outFiles[meta.multiCam.display]);
     if (meta.multiCam.calibration) {
-      command.push(`-s measure:cal_fpath="${meta.multiCam.calibration}"`);
+      command.push(`-s measurer:calibration_file="${meta.multiCam.calibration}"`);
     }
   } else if (pipeline.type === 'measurement') {
-    throw new Error('Attempting run a multicam pipeline on non multicam data');
+    throw new Error('Attempting to run a multicam pipeline on non multicam data');
   }
 
   const job = observeChild(spawn(command.join(' '), {
@@ -175,9 +181,13 @@ async function runPipeline(
   job.on('exit', async (code) => {
     if (code === 0) {
       try {
-        await common.processOtherAnnotationFiles(
-          settings, datasetId, [trackOutput, detectorOutput],
+        const { attributes } = await common.processOtherAnnotationFiles(
+          settings, datasetId, [trackOutput, detectorOutput], multiOutFiles,
         );
+        if (attributes) {
+          meta.attributes = attributes;
+          await common.saveMetadata(settings, datasetId, meta);
+        }
       } catch (err) {
         console.error(err);
       }

@@ -7,7 +7,7 @@ import {
 } from 'dive-common/constants';
 
 import {
-  makeViameFolder, postProcess,
+  makeViameFolder, multiCamPostProcess, postProcess,
 } from '../api/viame.service';
 import { getResponseError } from '../utils';
 
@@ -109,7 +109,8 @@ export default Vue.extend({
       if (!createSubFolders) {
         folder = await this.createUploadFolder(name, fps, pendingUpload.type);
         if (folder) {
-          await this.uploadFiles(pendingUpload.name, folder, files, uploaded);
+          await this.uploadFiles(pendingUpload.name, folder, files,
+            uploaded, pendingUpload.type, pendingUpload.multiCam);
           this.remove(pendingUpload);
         }
       } else {
@@ -123,7 +124,10 @@ export default Vue.extend({
           folder = await (this.createUploadFolder(subname, fps, subtype));
           if (folder) {
             // eslint-disable-next-line no-await-in-loop
-            await this.uploadFiles(subname, folder, subfile, uploaded);
+            await this.uploadFiles(
+              subname, folder, subfile, uploaded,
+              subtype, pendingUpload.multiCam,
+            );
           }
         }
         this.remove(pendingUpload);
@@ -143,14 +147,18 @@ export default Vue.extend({
         throw error;
       }
     },
-    async uploadFiles(name, folder, files, uploaded) {
+    async uploadFiles(name, folder, files, uploaded, subtype, multiCam) {
       // function called after mixins upload finishes
       const postUpload = async (data) => {
         uploaded.push({
           folder,
           results: data.results,
         });
-        await postProcess(folder._id);
+        if (subtype !== 'multi') {
+          await postProcess(folder._id);
+        } else if (multiCam) {
+          await multiCamPostProcess(folder._id, multiCam);
+        }
       };
       // Sets the files used by the fileUploader mixin
       this.setFiles(files);

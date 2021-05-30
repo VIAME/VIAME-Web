@@ -1,16 +1,30 @@
 import type { GirderModel } from '@girder/components/src';
 
 import {
+  CustomMediaImportPayload,
   DatasetMetaMutable,
   DatasetType,
   Pipe, Pipelines, SaveAttributeArgs, TrainingConfigs,
 } from 'dive-common/apispec';
 import {
-  calibrationFileTypes, inputAnnotationFileTypes, otherImageTypes,
+  calibrationFileTypes, fileVideoTypes, inputAnnotationFileTypes,
+  inputAnnotationTypes, otherImageTypes,
   otherVideoTypes, websafeImageTypes, websafeVideoTypes,
 } from 'dive-common/constants';
 import girderRest from '../plugins/girder';
 
+
+export interface MultiCamWeb {
+  cameras: Record<string, {
+    originalBaseId: string;
+    type: DatasetType;
+  }>;
+  display: string;
+  calibration: string;
+}
+interface HTMLFile extends File {
+  webkitRelativePath?: string;
+}
 interface ValidationResponse {
   ok: boolean;
   type: 'video' | 'image-sequence';
@@ -127,6 +141,43 @@ function postProcess(folderId: string) {
   return girderRest.post(`viame/postprocess/${folderId}`);
 }
 
+function multiCamPostProcess(folderId: string,
+  args: { defaultDisplay: string; folderList: Record<string, string[]>; calibrationFile: string}) {
+  return girderRest.post(`viame/multicam_postprocess/${folderId}`, args);
+}
+
+async function importAnnotation(parentId: string, file: HTMLFile) {
+  const resp = await girderRest.post('/file', null, {
+    params: {
+      parentType: 'folder',
+      parentId,
+      name: file.name,
+      size: file.size,
+      mimeType: file.type,
+    },
+  });
+  if (resp.status === 200) {
+    const uploadResponse = await girderRest.post('file/chunk', file, {
+      params: {
+        uploadId: resp.data._id,
+        offset: 0,
+      },
+      headers: { 'Content-Type': 'application/octet-stream' },
+    });
+    if (uploadResponse.status === 200) {
+      const final = await girderRest.post(`viame/postprocess/${parentId}`, null, {
+        params: {
+          skipJobs: true,
+        },
+      });
+      if (final.status === 200) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 async function setUsePrivateQueue(userId: string, value = false): Promise<{
   'user_private_queue_enabled': boolean;
 }> {
@@ -149,30 +200,64 @@ async function getValidWebImages(folderId: string) {
   });
   return data;
 }
-
-async function openFromDisk(datasetType: DatasetType | 'calibration' | 'annotation'):
-Promise<{ canceled: boolean; filePaths: string[]; fileList?: File[]}> {
+async function openFromDisk(datasetType: DatasetType | 'calibration' | 'annotation', directory = false):
+Promise<{ canceled: boolean; filePaths: string[]; fileList?: File[]; root?: string }> {
   const input: HTMLInputElement = document.createElement('input');
   input.type = 'file';
   const baseTypes: string[] = inputAnnotationFileTypes.map((item) => `.${item}`);
   input.multiple = true;
+  if (directory) {
+    // Webkit directory is necessary for loading a folder
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
+    input.webkitdirectory = true;
+    input.multiple = false;
+  }
   if (datasetType === 'image-sequence') {
     input.accept = baseTypes.concat(websafeImageTypes).concat(otherImageTypes).join(',');
   } else if (datasetType === 'video') {
-    input.accept = baseTypes.concat(websafeVideoTypes).concat(otherVideoTypes).join(',');
+    input.accept = baseTypes.concat(websafeVideoTypes).concat(otherVideoTypes)
+      .concat(fileVideoTypes.map((item) => `.${item}`)).join(',');
   } else if (datasetType === 'calibration') {
     input.accept = calibrationFileTypes.map((item) => `.${item}`).join(',');
+  } else if (datasetType === 'annotation') {
+    input.accept = inputAnnotationTypes
+      .concat(inputAnnotationFileTypes.map((item) => `.${item}`)).join(',');
   }
-  return new Promise(((resolve) => {
+  return new Promise((resolve) => {
     input.onchange = (event) => {
       if (event) {
         const { files } = event.target as HTMLInputElement;
         if (files) {
-          const fileList = Array.from(files);
+          let fileList = Array.from(files) as HTMLFile[];
+          let root;
+          // Calculate the root and remove any recursive subdirectories
+          if (fileList[0]?.webkitRelativePath !== undefined && directory) {
+            root = fileList[0]?.webkitRelativePath.replace(`/${fileList[0].name}`, '');
+            let filterType = ['application/octet-stream']
+              .concat(inputAnnotationTypes);
+
+            if (datasetType === 'image-sequence') {
+              filterType = filterType
+                .concat(websafeImageTypes)
+                .concat(otherImageTypes);
+            } else if (datasetType === 'video') {
+              filterType = filterType
+                .concat(websafeVideoTypes)
+                .concat(otherVideoTypes);
+            }
+            fileList = fileList.filter((item) => {
+              if (item.webkitRelativePath && item.webkitRelativePath.split('/').length > 2) {
+                return false;
+              }
+              return filterType.includes(item.type);
+            });
+          }
           const response = {
             canceled: !files.length,
             fileList,
             filePaths: fileList.map((item) => item.name),
+            root,
           };
           return resolve(response);
         }
@@ -183,7 +268,16 @@ Promise<{ canceled: boolean; filePaths: string[]; fileList?: File[]}> {
       });
     };
     input.click();
-  }));
+  });
+}
+async function importMedia(files: string[]): Promise<CustomMediaImportPayload> {
+  return {
+    jsonMeta: {
+      originalImageFiles: files,
+    },
+    globPattern: '',
+    mediaConvertList: [],
+  };
 }
 
 export {
@@ -193,6 +287,8 @@ export {
   getPipelineList,
   makeViameFolder,
   postProcess,
+  multiCamPostProcess,
+  importAnnotation,
   runPipeline,
   getTrainingConfigurations,
   runTraining,
@@ -202,4 +298,5 @@ export {
   validateUploadGroup,
   getValidWebImages,
   openFromDisk,
+  importMedia,
 };

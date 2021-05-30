@@ -75,6 +75,13 @@ export default function register() {
     return ret;
   });
 
+  ipcMain.handle('import-annotation', async (event, { id, path }: { id: string; path: string }) => {
+    const ret = await common.annotationImport(
+      settings.get(), id, path,
+    );
+    return ret;
+  });
+
 
   ipcMain.handle('finalize-import', async (event, args: MediaImportPayload) => {
     const updater = (update: DesktopJobUpdate) => {

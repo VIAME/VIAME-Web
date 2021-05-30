@@ -10,6 +10,7 @@ from girder.models.folder import Folder
 from girder.models.item import Item
 from girder.utility import ziputil
 
+from dive_server import multicam
 from dive_server.serializers import viame
 from dive_server.utils import (
     detections_file,
@@ -19,10 +20,12 @@ from dive_server.utils import (
     saveTracks,
     verify_dataset,
 )
-from dive_utils import fromMeta, models
+from dive_utils import TRUTHY_META_VALUES, fromMeta, models
 from dive_utils.constants import (
     FPSMarker,
     ImageSequenceType,
+    MultiCamMarker,
+    SingleMultiCamMarker,
     TypeMarker,
     VideoType,
     imageRegex,
@@ -46,20 +49,35 @@ class ViameDetection(Resource):
         videoUrl = None
         video = None
 
+        if fromMeta(folder, SingleMultiCamMarker) in TRUTHY_META_VALUES:
+            item = Item().findOne(
+                {
+                    'folderId': folder['_id'],
+                    'meta.codec': 'h264',
+                    'meta.source_video': {
+                        '$in': [
+                            # In a previous version, source_video was unset
+                            None,
+                            False,
+                        ]
+                    },
+                }
+            )
         # Find a video tagged with an h264 codec left by the transcoder
-        item = Item().findOne(
-            {
-                'folderId': getCloneRoot(self.getCurrentUser(), folder)['_id'],
-                'meta.codec': 'h264',
-                'meta.source_video': {
-                    '$in': [
-                        # In a previous version, source_video was unset
-                        None,
-                        False,
-                    ]
-                },
-            }
-        )
+        else:
+            item = Item().findOne(
+                {
+                    'folderId': getCloneRoot(self.getCurrentUser(), folder)['_id'],
+                    'meta.codec': 'h264',
+                    'meta.source_video': {
+                        '$in': [
+                            # In a previous version, source_video was unset
+                            None,
+                            False,
+                        ]
+                    },
+                }
+            )
         if item:
             video = Item().childFiles(item)[0]
             videoUrl = f'/api/v1/file/{str(video["_id"])}/download'

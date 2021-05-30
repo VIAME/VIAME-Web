@@ -4,18 +4,15 @@ import {
   computed, defineComponent, ref, Ref, PropType,
 } from '@vue/composition-api';
 import { filterByGlob } from 'platform/desktop/sharedUtils';
-import { DatasetType, useApi } from 'dive-common/apispec';
+import {
+  CustomMediaImportPayload,
+  DatasetType,
+  HTMLFileReferences,
+  useApi,
+} from 'dive-common/apispec';
 
 import ImportMultiCamAddType from 'dive-common/components/ImportMultiCamAddType.vue';
 
-//Custom subset of MediaImportPayload for comaptiblity with web and desktop
-interface CustomMediaImportPayload {
-  jsonMeta: {
-    originalImageFiles: string[];
-  };
-  globPattern: string;
-  mediaConvertList: string[];
-}
 
 export default defineComponent({
   components: {
@@ -31,13 +28,9 @@ export default defineComponent({
       type: String as PropType<'image-sequence' | 'video'>,
       default: 'image-sequence',
     },
-    importMedia: {
-      type: Function as PropType<(path: string) => Promise<CustomMediaImportPayload>>,
-      required: true,
-    },
   },
   setup(props, { emit }) {
-    const { openFromDisk } = useApi();
+    const { openFromDisk, importMedia } = useApi();
     const importType: Ref<'multi'|'keyword'| ''> = ref('');
     const folderList: Ref<Record<string, string>> = ref({});
     const keywordFolder = ref('');
@@ -48,6 +41,9 @@ export default defineComponent({
     const addNewToggle = ref(false);
     const newSetName = ref('');
 
+    const htmlFileReferences: HTMLFileReferences = {
+      mediaHTMLFileList: {},
+    }; //Used to store fileReferences for Web version
     if (props.stereo) {
       folderList.value = {
         left: '',
@@ -126,17 +122,33 @@ export default defineComponent({
     });
 
     async function open(dstype: DatasetType | 'calibration', folder: string | 'calibration') {
-      const ret = await openFromDisk(dstype);
+      const ret = await openFromDisk(dstype, dstype === 'image-sequence');
       if (!ret.canceled) {
         try {
           const path = ret.filePaths[0];
           if (folder === 'calibration') {
             calibrationFile.value = path;
+            if (ret.fileList?.length) {
+              [htmlFileReferences.calibrationHTMLFile] = ret.fileList;
+            }
           } else if (importType.value === 'multi') {
-            folderList.value[folder] = path;
+            if (ret.root) {
+              folderList.value[folder] = ret.root;
+            } else {
+              folderList.value[folder] = path;
+            }
+            if (ret.fileList) {
+              htmlFileReferences.mediaHTMLFileList[folder] = ret.fileList;
+            }
           } else if (importType.value === 'keyword') {
-            keywordFolder.value = path;
-            pendingImportPayload.value = await props.importMedia(ret.filePaths[0]);
+            [keywordFolder.value] = ret.filePaths;
+            if (ret.root) {
+              keywordFolder.value = ret.root;
+            }
+            pendingImportPayload.value = await importMedia(ret.filePaths);
+            if (ret.fileList) {
+              htmlFileReferences.mediaHTMLFileList[folder] = ret.fileList;
+            }
           }
         } catch (err) {
           console.error(err);
@@ -176,6 +188,7 @@ export default defineComponent({
           folderList: folderList.value,
           calibrationFile: calibrationFile.value,
           type: props.dataType,
+          htmlFileReferences,
         });
       } else if (importType.value === 'keyword') {
         emit('begin-multicam-import', {
@@ -184,6 +197,7 @@ export default defineComponent({
           globList: globList.value,
           calibrationFile: calibrationFile.value,
           type: 'image-sequence',
+          htmlFileReferences,
         });
       }
     };

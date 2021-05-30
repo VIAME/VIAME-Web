@@ -76,6 +76,7 @@ export default defineComponent({
     }
 
     const availableItems = computed(() => Object.values(datasets.value)
+      .filter((item) => item.type === 'video' || item.type === 'image-sequence')
       .map((item) => ({
         ...item,
         included: item.id in data.stagedItems,

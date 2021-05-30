@@ -94,7 +94,7 @@ export default defineComponent({
         <template #activator="{ on: ton, attrs: tattrs }">
           <v-btn
             v-bind="{ ...tattrs, ...buttonOptions }"
-            :disabled="source === null || !source.meta.annotate"
+            :disabled="source === null || !source.meta.annotate || !!source.meta.subType"
             v-on="{ ...ton, click }"
           >
             <v-icon>

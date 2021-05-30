@@ -11,7 +11,8 @@ import {
 
 import ImportButton from 'dive-common/components/ImportButton.vue';
 import ImportMultiCamDialog from 'dive-common/components/ImportMultiCamDialog.vue';
-import { DatasetType, MultiCamImportArgs } from 'dive-common/apispec';
+import { DatasetType, MultiCamImportFolderArgs, MultiCamImportKeywordArgs } from 'dive-common/apispec';
+import { filterByGlob } from 'platform/desktop/sharedUtils';
 import UploadGirder from './UploadGirder.vue';
 import {
   validateUploadGroup, openFromDisk,
@@ -37,9 +38,15 @@ export interface PendingUpload {
   meta: null | File;
   annotationFile: null | File;
   mediaList: File[];
-  type: DatasetType;
+  type: DatasetType | 'multi';
   fps: number;
   uploading: boolean;
+    multiCam?: {
+      folderList: Record<string, string[]>;
+      calibrationFile?: string;
+      defaultDisplay: string;
+    };
+
 }
 
 interface GirderUpload {
@@ -182,9 +189,56 @@ export default defineComponent({
     });
     //TODO:  Implementation of the finalization of the Import.  Requires
     // Creation of an endpoint in the server which supports MultiCamImportArgs
-    const multiCamImport = (args: MultiCamImportArgs) => {
-      // eslint-disable-next-line no-console
-      console.log(args);
+    const multiCamImport = (args: MultiCamImportKeywordArgs | MultiCamImportFolderArgs) => {
+      //Lets go through all files and modify any duplicates
+      let mediaList: File[] = [];
+      const folderList: Record<string, string[]> = {};
+      if ((args as MultiCamImportKeywordArgs).globList !== undefined) {
+        const keywordArgs = (args as MultiCamImportKeywordArgs);
+        //We need to divide by glob list into different folders
+        if (args.htmlFileReferences?.mediaHTMLFileList.keyword) {
+          const { mediaHTMLFileList } = args.htmlFileReferences;
+          mediaList = mediaList.concat(mediaHTMLFileList.keyword);
+          Object.entries(keywordArgs.globList).forEach(([key, glob]) => {
+            folderList[key] = filterByGlob(
+              glob,
+              mediaHTMLFileList.keyword.map((item) => item.name),
+            );
+          });
+        }
+      } else if (args.htmlFileReferences?.mediaHTMLFileList) {
+        const { mediaHTMLFileList } = args.htmlFileReferences;
+        Object.keys(mediaHTMLFileList).forEach((key) => {
+          mediaList = mediaList.concat(mediaHTMLFileList[key]);
+          folderList[key] = mediaHTMLFileList[key].map((item) => item.name);
+        });
+      }
+
+      const calibrationFile = args.htmlFileReferences?.calibrationHTMLFile?.name;
+
+      if (args.htmlFileReferences?.calibrationHTMLFile) {
+        mediaList.push(args.htmlFileReferences.calibrationHTMLFile);
+      }
+      const fps = DefaultVideoFPS;
+      //So now we take the args and modify the list of files we have to edit them
+      preUploadErrorMessage.value = null;
+      pendingUploads.value.push({
+        createSubFolders: false,
+        name: 'multi',
+        files: [], //Will be set in the GirderUpload Component
+        mediaList,
+        meta: null,
+        annotationFile: null,
+        type: 'multi',
+        fps,
+        uploading: false,
+        multiCam: {
+          folderList,
+          calibrationFile,
+          defaultDisplay: args.defaultDisplay,
+        },
+      });
+      importMultiCamDialog.value = false;
     };
     // Filter to show how many files are left to upload
     const filesNotUploaded = (item: PendingUpload) => item.files.filter(
@@ -206,6 +260,9 @@ export default defineComponent({
           // For videos we display the total progress when uploading because
           // single videos can be large
           return `${formatSize(totalProgress)} of ${formatSize(totalSize)}`;
+        }
+        if (pendingUpload.type === 'multi') {
+          return `${filesNotUploaded(pendingUpload)} files`;
         }
       }
       throw new Error(`could not determine adequate formatting for ${pendingUpload}`);
@@ -305,16 +362,17 @@ export default defineComponent({
       close,
       openImport,
       processImport,
-      openMultiCamDialog,
       filterFileUpload,
-      multiCamImportCheck,
-      multiCamImport,
       computeUploadProgress,
       getFilenameInputStateLabel,
       getFilenameInputStateDisabled,
       getFilenameInputStateHint,
       addPendingUpload,
       remove,
+      // MultiCam Methods
+      openMultiCamDialog,
+      multiCamImportCheck,
+      multiCamImport,
       abort,
     };
   },
@@ -333,7 +391,6 @@ export default defineComponent({
         v-if="importMultiCamDialog"
         :stereo="stereo"
         :data-type="multiCamOpenType"
-        :import-media="multiCamImportCheck"
         @begin-multicam-import="multiCamImport($event)"
         @abort="importMultiCamDialog = false; preUploadErrorMessage = null"
       />
@@ -426,50 +483,35 @@ export default defineComponent({
             </v-row>
             <v-row v-if="!pendingUpload.createSubFolders">
               <v-col class="py-0">
-                <v-row>
+                <v-row v-if="!pendingUpload.createSubFolders && pendingUpload.type !== 'multi'">
                   <v-col>
-                    <v-file-input
-                      v-model="pendingUpload.mediaList"
-                      multiple
-                      show-size
-                      counter
-                      :disabled="pendingUpload.uploading"
-                      :prepend-icon="
-                        pendingUpload.type === 'image-sequence'
-                          ? 'mdi-image-multiple'
-                          : 'mdi-file-video'
-                      "
-                      :label="
-                        pendingUpload.type === 'image-sequence'
-                          ? 'Image files'
-                          : 'Video file'
-                      "
-                      :rules="[val => (val || '').length > 0 || 'Media Files are required']"
-                      :accept="filterFileUpload(pendingUpload.type)"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-file-input
-                      v-model="pendingUpload.annotationFile"
-                      show-size
-                      counter
-                      prepend-icon="mdi-file-table"
-                      label="Annotation File (Optional)"
-                      hint="Optional"
-                      :disabled="pendingUpload.uploading"
-                      :accept="filterFileUpload('annotation')"
-                    />
-                  </v-col>
-                  <v-col v-if="!hideMeta">
-                    <v-file-input
-                      v-model="pendingUpload.meta"
-                      show-size
-                      counter
-                      label="Meta File"
-                      hint="Optional"
-                      :disabled="pendingUpload.uploading"
-                      :accept="filterFileUpload('meta')"
-                    />
+                    <v-row>
+                      <v-col>
+                        <v-file-input
+                          v-model="pendingUpload.mediaList"
+                          label="Media Files"
+                          multiple
+                          :rules="[val => (val || '').length > 0 || 'Media Files are required']"
+                          :accept="filterFileUpload(pendingUpload.type)"
+                        />
+                      </v-col>
+                      <v-col>
+                        <v-file-input
+                          v-model="pendingUpload.annotationFile"
+                          label="Annotation File"
+                          hint="Optional"
+                          :accept="filterFileUpload('annotation')"
+                        />
+                      </v-col>
+                      <v-col v-if="!hideMeta">
+                        <v-file-input
+                          v-model="pendingUpload.meta"
+                          label="Meta File"
+                          hint="Optional"
+                          :accept="filterFileUpload('meta')"
+                        />
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
               </v-col>

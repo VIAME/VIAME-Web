@@ -18,8 +18,11 @@ export async function migrate() {
  */
 export default function wrap(): Api {
   async function loadMetadata(datasetId: string) {
-    const meta = await api.loadMetadata(datasetId);
-    setRecents(meta);
+    const meta = await api.loadMetadata(encodeURIComponent(datasetId));
+    // Only if not multi
+    if (!datasetId.includes('/')) {
+      setRecents(meta);
+    }
     return meta;
   }
 

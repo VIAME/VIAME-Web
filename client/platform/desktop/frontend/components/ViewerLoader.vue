@@ -1,8 +1,11 @@
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { computed, defineComponent, ref } from '@vue/composition-api';
+
 
 import Viewer from 'dive-common/components/Viewer.vue';
 import RunPipelineMenu from 'dive-common/components/RunPipelineMenu.vue';
+import ImportAnnotations from 'dive-common//components/ImportAnnotations.vue';
+import * as api from '../api';
 
 import Export from './Export.vue';
 import JobTab from './JobTab.vue';
@@ -27,6 +30,7 @@ export default defineComponent({
     JobTab,
     RunPipelineMenu,
     Viewer,
+    ImportAnnotations,
   },
   props: {
     id: {
@@ -34,18 +38,39 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props) {
+    const viewerRef = ref();
+    const currentId = ref(props.id);
+    const subType = computed(() => [datasets.value[currentId.value]?.subType || null]);
+    const importAnnotationFile = async (id: string, path: string) => {
+      const result = await api.importAnnotation(id, path);
+      if (result) {
+        viewerRef.value.reloadData();
+      }
+    };
+    const updateId = (id: string) => {
+      currentId.value = id;
+    };
     return {
-      buttonOptions,
+      currentId,
       datasets,
+      subType,
+      importAnnotationFile,
+      viewerRef,
+      buttonOptions,
       menuOptions,
+      updateId,
     };
   },
 });
 </script>
 
 <template>
-  <Viewer :id="id">
+  <Viewer
+    :id="id"
+    ref="viewerRef"
+    @updateId="updateId"
+  >
     <template #title>
       <v-tabs
         icons-and-text
@@ -67,12 +92,19 @@ export default defineComponent({
     </template>
     <template #title-right>
       <RunPipelineMenu
-        :selected-dataset-ids="[id]"
+        :selected-dataset-ids="[currentId]"
+        :sub-type-list="subType"
         v-bind="{ buttonOptions, menuOptions }"
       />
+      <ImportAnnotations
+        :dataset-id="currentId"
+        block-on-unsaved
+        v-bind="{ buttonOptions, menuOptions }"
+        @import-annotation-file="importAnnotationFile"
+      />
       <Export
-        v-if="datasets[id]"
-        :id="id"
+        v-if="datasets[currentId] || currentId"
+        :id="currentId"
         :button-options="buttonOptions"
       />
     </template>

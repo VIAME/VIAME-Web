@@ -20,6 +20,10 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
     },
+    subTypeList: {
+      type: Array,
+      default: () => ([]),
+    },
   },
 
   setup(props, { root }) {
@@ -34,7 +38,16 @@ export default defineComponent({
       selectedTrainingConfig.value = resp.default;
     });
 
-    const trainingDisabled = computed(() => props.selectedDatasetIds.length === 0);
+    const trainingDisabled = computed(() => {
+      if (props.selectedDatasetIds.length === 0) {
+        return true;
+      }
+      // All subTypes need to be the same to enable training and we don't support training on stereo
+      if (props.subTypeList.some((v) => v !== null)) {
+        return true;
+      }
+      return false;
+    });
     const trainingOutputName = ref<string | null>(null);
     const menuOpen = ref(false);
 

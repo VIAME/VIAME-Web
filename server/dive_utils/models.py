@@ -84,6 +84,14 @@ class MetadataMutableUpdate(BaseModel):
         extra = 'forbid'
 
 
+class MultiCamArgs(BaseModel):
+    defaultDisplay: str  # In multicam the default camera to display
+    folderList: Dict[
+        str, List[str]
+    ]  # Camera name and folder import list of images or files
+    calibrationFile: Optional[str]  # NPZ calibation matrix file
+
+
 class SummaryItemSchema(BaseModel):
     value: str
     total_tracks: int

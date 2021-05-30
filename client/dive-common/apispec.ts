@@ -6,6 +6,7 @@ import { Attribute } from 'vue-media-annotator/use/useAttributes';
 import { CustomStyle } from 'vue-media-annotator/use/useStyling';
 
 type DatasetType = 'image-sequence' | 'video';
+type SubType = 'stereo' | 'multicam' | null;
 type MultiTrackRecord = Record<string, TrackData>;
 
 interface Pipe {
@@ -41,22 +42,48 @@ interface FrameImage {
   filename: string;
 }
 
+export interface HTMLFileReferences {
+  mediaHTMLFileList: Record<string, File[]>;
+  calibrationHTMLFile?: File;
+}
+
 export interface MultiCamImportFolderArgs {
   defaultDisplay: string; // In multicam the default camera to display
   folderList: Record<string, string>; // Camera name and folder import for images or file for videos
+  type: DatasetType;
   calibrationFile?: string; // NPZ calibation matrix file
-  type: 'image-sequence' | 'video';
-}
+  htmlFileReferences?: HTMLFileReferences; // Web version file references used for uploading
 
+}
 export interface MultiCamImportKeywordArgs {
   defaultDisplay: string; // In multicam the default camera to display
   keywordFolder: string; // Base folder used for import, globList will filter folder
   globList: Record<string, string>; // Camera name key and glob pattern for keywordfolder
-  calibrationFile?: string; // NPZ calibration matrix file
   type: 'image-sequence'; // Always image-sequence type for glob matching
+  calibrationFile?: string; // NPZ calibration matrix file
+  htmlFileReferences?: HTMLFileReferences; // Web version file references used for uploading
 }
 
 export type MultiCamImportArgs = MultiCamImportFolderArgs | MultiCamImportKeywordArgs;
+
+
+interface MultiCamMedia {
+  cameras: Record<string, {
+    type: DatasetType;
+    imageData: FrameImage[];
+    videoUrl: string | undefined;
+  }>;
+  display: string;
+}
+
+interface CustomMediaImportPayload {
+  jsonMeta: {
+    originalImageFiles: string[];
+  };
+  globPattern: string;
+  mediaConvertList: string[];
+}
+
 
 /**
  * The parts of metadata a user should be able to modify.
@@ -75,6 +102,8 @@ interface DatasetMeta extends DatasetMetaMutable {
   name: Readonly<string>;
   createdAt: Readonly<string>;
   attributes?: Readonly<Record<string, Attribute>>;
+  subType: Readonly<SubType>; // In future this could have stuff like IR/EO
+  multiCamMedia: Readonly<MultiCamMedia | null>;
 }
 
 interface Api {
@@ -92,7 +121,10 @@ interface Api {
   saveMetadata(datasetId: string, metadata: DatasetMetaMutable): Promise<unknown>;
   saveAttributes(datasetId: string, args: SaveAttributeArgs): Promise<unknown>;
   // Non-Endpoint shared functions
-  openFromDisk(datasetType: DatasetType | 'calibration'): Promise<{canceled?: boolean; filePaths: string[]; fileList?: File[]}>;}
+  openFromDisk(datasetType: DatasetType | 'calibration' | 'annotation', directory?: boolean):
+    Promise<{canceled?: boolean; filePaths: string[]; fileList?: File[]; root?: string}>;
+  importMedia(path: string[]): Promise<CustomMediaImportPayload>;
+}
 
 const ApiSymbol = Symbol('api');
 
@@ -119,6 +151,7 @@ export type {
   DatasetMeta,
   DatasetMetaMutable,
   DatasetType,
+  SubType,
   FrameImage,
   MultiTrackRecord,
   Pipe,
@@ -126,4 +159,6 @@ export type {
   SaveDetectionsArgs,
   SaveAttributeArgs,
   TrainingConfigs,
+  MultiCamMedia,
+  CustomMediaImportPayload,
 };

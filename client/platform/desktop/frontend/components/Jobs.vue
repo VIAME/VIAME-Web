@@ -104,7 +104,7 @@ export default defineComponent({
                 </v-col>
                 <v-col cols="8">
                   <v-card-title class="primary--text text--lighten-3 text-decoration-none pt-0">
-                    {{ job.job.jobType }}: {{ datasets[job.job.datasetIds[0]].name }}
+                    {{ job.job.jobType }}: {{ datasets[job.job.datasetIds[0].split('/')[0]].name }}
                   </v-card-title>
                   <v-card-subtitle>
                     <table class="key-value-table">

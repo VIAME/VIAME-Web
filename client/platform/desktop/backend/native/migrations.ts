@@ -8,6 +8,9 @@ function upgrade(meta: JsonMeta) {
       // This will be an incorrect value.
       meta.originalFps = meta.fps;
     }
+    if (meta.multiCam === undefined) {
+      meta.multiCam = null;
+    }
   } else if (meta.version < JsonMetaCurrentVersion) {
     /* Perform major version upgrade */
     console.error('Impossible schema', meta);

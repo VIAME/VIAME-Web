@@ -16,7 +16,10 @@
       :rows="info"
       title="Info"
     />
-    <slot name="actions" />
+    <slot
+      name="actions"
+      v-bind="{ subTypeList }"
+    />
   </v-card>
 </template>
 
@@ -64,6 +67,11 @@ export const DefaultInfoKeys = [
     meta: true,
     value: 'type',
     name: 'Type: ',
+  },
+  {
+    meta: true,
+    value: 'subType',
+    name: 'Sub Type: ',
   },
   {
     meta: true,
@@ -163,6 +171,22 @@ export default Vue.extend({
         return [...countMessages, sizeMessage];
       }
       return [];
+    },
+    // Used to pass to Taining/Cloning/Pipelines for filtering stereo/multicam features
+    subTypeList() {
+      if (this.details) {
+        if (this.details.meta?.subType) {
+          return [this.details.meta.subType];
+        }
+      } else if (this.value.length > 1) {
+        return this.value.map((item) => {
+          if (item.meta && item.meta.subType) {
+            return item.meta.subType;
+          }
+          return '';
+        });
+      }
+      return [''];
     },
   },
 });

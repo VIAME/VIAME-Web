@@ -6,7 +6,7 @@ import { DatasetMeta, DatasetMetaMutable, DatasetType } from 'dive-common/apispe
  */
 interface GirderMetadataStatic extends DatasetMetaMutable {
   id: string;
-  type: Readonly<DatasetType>;
+  type: Readonly<DatasetType | 'multi'>;
   fps: Readonly<number>;
   name: string;
   createdAt: string;

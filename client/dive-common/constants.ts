@@ -1,10 +1,12 @@
 const ImageSequenceType = 'image-sequence';
 const VideoType = 'video';
+const MultiType = 'multi';
 
 const MediaTypes = {
   // friendly media type names
   [ImageSequenceType]: 'image sequence',
   [VideoType]: 'video',
+  [MultiType]: 'multi',
 };
 
 const DefaultVideoFPS = 10;
@@ -75,11 +77,15 @@ const inputAnnotationFileTypes = [
   'csv',
 ];
 
+const stereoPipelineMarker = 'measurement';
+const multiCamPipelineMarker = ''; //Placeholder
+
 export {
   DefaultVideoFPS,
   ImageSequenceType,
   VideoType,
   MediaTypes,
+  MultiType,
   FPSOptions,
   calibrationFileTypes,
   fileVideoTypes,
@@ -89,4 +95,6 @@ export {
   websafeVideoTypes,
   inputAnnotationTypes,
   inputAnnotationFileTypes,
+  stereoPipelineMarker,
+  multiCamPipelineMarker,
 };

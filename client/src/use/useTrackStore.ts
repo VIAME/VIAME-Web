@@ -107,7 +107,7 @@ export default function useTrackStore({ markChangesPending }: UseTrackStoreParam
     return track;
   }
 
-  function removeTrack(trackId: TrackId | null): void {
+  function removeTrack(trackId: TrackId | null, disableNotifications = false): void {
     if (trackId === null) {
       return;
     }
@@ -123,9 +123,17 @@ export default function useTrackStore({ markChangesPending }: UseTrackStoreParam
       throw new Error(`TrackId ${trackId} not found in trackIds.`);
     }
     trackIds.value.splice(listIndex, 1);
-    markChangesPending({ action: 'delete', track });
+    if (!disableNotifications) {
+      markChangesPending({ action: 'delete', track });
+    }
   }
 
+  function clearAllTracks() {
+    trackIds.value.forEach((track) => {
+      removeTrack(track, true);
+    });
+    trackIds.value = [];
+  }
   /*
    * Discard tracks whose highest confidencePair value
    * is lower than specified.
@@ -156,5 +164,6 @@ export default function useTrackStore({ markChangesPending }: UseTrackStoreParam
     getNewTrackId,
     removeTrack,
     removeTracksBelowConfidence,
+    clearAllTracks,
   };
 }

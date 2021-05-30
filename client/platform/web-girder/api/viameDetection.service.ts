@@ -60,6 +60,10 @@ async function getClipMeta(folderId: string) {
   return data as ClipMetaResponse;
 }
 
+interface MultiMetaResponse {
+  folderId: string;
+  type: DatasetType;
+}
 export {
   getClipMeta,
   getExportUrls,

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Install, { ref, computed } from '@vue/composition-api';
 import { JsonMeta } from 'platform/desktop/constants';
-import { DatasetType } from 'dive-common/apispec';
+import { DatasetType, SubType } from 'dive-common/apispec';
 
 const RecentsKey = 'desktop.recent';
 
@@ -15,7 +15,7 @@ Vue.use(Install);
  */
 export interface JsonMetaCache {
   version: number;
-  type: DatasetType;
+  type: DatasetType | 'multi';
   id: string;
   fps: number;
   name: string;
@@ -23,8 +23,7 @@ export interface JsonMetaCache {
   originalBasePath: string;
   originalVideoFile: string;
   transcodedVideoFile?: string;
-  multiCam?: boolean; // TODO: when DatasetType is updated we need to swap this to type
-  stereo?: boolean; // Contains stereo left/right pairs and calibration file
+  subType: SubType;
 }
 
 /**
@@ -35,6 +34,7 @@ function hydrateJsonMetaCacheValue(input: any): JsonMetaCache {
   return {
     originalVideoFile: '',
     transcodedVideoFile: '',
+    subType: null,
     ...input,
   };
 }
@@ -98,8 +98,7 @@ function setRecents(meta: JsonMeta) {
     originalBasePath: meta.originalBasePath,
     originalVideoFile: meta.originalVideoFile,
     transcodedVideoFile: meta.transcodedVideoFile,
-    multiCam: !!meta.multiCam,
-    stereo: meta.multiCam && meta.multiCam.calibration,
+    subType: meta.subType,
   } as JsonMetaCache);
   const values = Object.values(datasets.value);
   window.localStorage.setItem(RecentsKey, JSON.stringify(values));

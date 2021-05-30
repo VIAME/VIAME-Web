@@ -4,14 +4,20 @@ SETTINGS_CONST_JOBS_CONFIGS = 'jobs_configs'
 
 ImageSequenceType = "image-sequence"
 VideoType = "video"
+MultiType = 'multi'
 DefaultVideoFPS = 10
 
 webValidImageFormats = {"png", "jpg", "jpeg"}
 validImageFormats = {*webValidImageFormats, "tif", "tiff", "sgi", "bmp", "pgm"}
 validVideoFormats = {"mp4", "avi", "mov", "mpg", "mpeg", "wmv", "flv"}
 
+calibrationFormats = {'npz'}
+
 videoRegex = re.compile(r"(\." + r"|\.".join(validVideoFormats) + ')$', re.IGNORECASE)
 imageRegex = re.compile(r"(\." + r"|\.".join(validImageFormats) + ')$', re.IGNORECASE)
+calibrationRegEx = re.compile(
+    r"(\." + r"|\.".join(calibrationFormats) + ')$', re.IGNORECASE
+)
 safeImageRegex = re.compile(
     r"(\." + r"|\.".join(webValidImageFormats) + ')$', re.IGNORECASE
 )
@@ -49,11 +55,19 @@ TypeMarker = "type"
 AssetstoreSourceMarker = "import_source"
 AssetstoreSourcePathMarker = "import_path"
 FPSMarker = "fps"
+# MultiCam Metadata markers
+MultiCamMarker = "multiCam"  # Metadata Marker for Group of Cameras
+SingleMultiCamMarker = "multiCamera"  # Marker for data for one camera in multicam
+CalibrationMarker = "calibration"
+SubTypeMarker = 'subType'
+StereoSubTypeMarker = 'stereo'
+MultiCamSubTypeMarker = 'multicam'
 OriginalFPSMarker = "originalFps"
 OriginalFPSStringMarker = "originalFpsString"
 
 # Other constants
 TrainedPipelineCategory = "trained"
+StereoPipelineMarker = "measurement"
 
 # The name of the folder where any user specific data should be stored
 # (created as a folder of that user)

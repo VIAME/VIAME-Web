@@ -8,6 +8,7 @@ from girder.models.token import Token
 from girder.models.user import User
 from girder_jobs.models.job import Job
 
+from dive_server.multicam import get_multicam_default_folder_id
 from dive_server.training import ensure_csv_detections_file
 from dive_server.utils import (
     detections_item,
@@ -23,6 +24,8 @@ from dive_utils.constants import (
     JOBCONST_PRIVATE_QUEUE,
     JOBCONST_RESULTS_FOLDER_ID,
     SETTINGS_CONST_JOBS_CONFIGS,
+    MultiType,
+    StereoPipelineMarker,
     TrainedPipelineCategory,
     TrainedPipelineMarker,
     UserPrivateQueueEnabledMarker,
@@ -158,9 +161,19 @@ def run_pipeline(
     move_existing_result_to_auxiliary_folder(folder, user)
     job_is_private = user.get(UserPrivateQueueEnabledMarker, False)
 
+    input_folder_id_str = folder_id_str
+    input_folder = folder
+    if folder['meta']['type'] == MultiType:
+        if pipeline["type"] != StereoPipelineMarker:
+            input_folder_id_str = get_multicam_default_folder_id(folder)
+            # Lets get the base display folder instead of the all data
+            input_folder = Folder().load(
+                input_folder_id_str, level=AccessType.READ, user=user
+            )
+
     params: PipelineJob = {
-        "input_folder": folder_id_str,
-        "input_type": fromMeta(folder, "type", required=True),
+        "input_folder": input_folder_id_str,
+        "input_type": fromMeta(input_folder, "type", required=True),
         "output_folder": folder_id_str,
         "pipeline": pipeline,
         "pipeline_input": detection_csv,

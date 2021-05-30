@@ -31,7 +31,9 @@ from dive_utils.constants import (
     SETTINGS_CONST_JOBS_CONFIGS,
     DatasetMarker,
     ForeignMediaIdMarker,
+    MultiCamMarker,
     PublishedMarker,
+    SingleMultiCamMarker,
     UserPrivateQueueEnabledMarker,
     csvRegex,
     imageRegex,
@@ -42,6 +44,7 @@ from dive_utils.constants import (
 )
 from dive_utils.types import AvailableJobSchema, PipelineDescription
 
+from .multicam import process_multicam_folder
 from .pipelines import load_pipelines, run_pipeline
 from .serializers import meva as meva_serializer
 from .training import ensure_csv_detections_file, training_output_folder
@@ -73,6 +76,7 @@ class Viame(Resource):
         self.route("POST", ("upgrade_pipelines",), self.upgrade_pipelines)
         self.route("POST", ("update_job_configs",), self.update_job_configs)
         self.route("POST", ("postprocess", ":id"), self.postprocess)
+        self.route("POST", ("multicam_postprocess", ":id"), self.multicam_postprocess)
         self.route("PUT", ("metadata", ":id"), self.update_metadata)
         self.route("PUT", ("attributes",), self.save_attributes)
         self.route("POST", ("validate_files",), self.validate_files)
@@ -454,6 +458,38 @@ class Viame(Resource):
 
     @access.user
     @autoDescribeRoute(
+        Description("Processing MultiCam Upload")
+        .modelParam(
+            "id",
+            description="Folder containing the items to process",
+            model=Folder,
+            level=AccessType.WRITE,
+        )
+        .jsonParam(
+            "args",
+            "JSON with the multiCam Metadata",
+            requireObject=True,
+            paramType="body",
+        )
+    )
+    def multicam_postprocess(self, folder, args):
+        """
+        Post-processing to be run after media/annotation multicam import.
+        Will take the import arguments and arrange the data properly into subfolders
+        Set the metadata related to multicam and kick off any transcoding jobs that are necessary
+        """
+        user = self.getCurrentUser()
+        # So we need to rearrange the uploaded data into proper sub folders based on the input args
+        validated = models.MultiCamArgs(**args)
+        output_meta = process_multicam_folder(user, folder, validated)
+        if output_meta is not None:
+            folder['meta'][MultiCamMarker] = output_meta
+            folder["meta"][DatasetMarker] = True
+            Folder().save(folder)
+        return output_meta
+
+    @access.user
+    @autoDescribeRoute(
         Description("Save mutable metadata for a dataset")
         .modelParam(
             "id",
@@ -530,10 +566,16 @@ class Viame(Resource):
         )
     )
     def get_valid_images(self, folder):
-        images = Folder().childItems(
-            getCloneRoot(self.getCurrentUser(), folder),
-            filters={"lowerName": {"$regex": safeImageRegex}},
-        )
+        if fromMeta(folder, SingleMultiCamMarker) in TRUTHY_META_VALUES:
+            images = Folder().childItems(
+                folder,
+                filters={"lowerName": {"$regex": safeImageRegex}},
+            )
+        else:
+            images = Folder().childItems(
+                getCloneRoot(self.getCurrentUser(), folder),
+                filters={"lowerName": {"$regex": safeImageRegex}},
+            )
 
         def unwrapItem(item1, item2):
             return strNumericCompare(item1['name'], item2['name'])
