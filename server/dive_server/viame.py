@@ -41,7 +41,7 @@ from dive_utils.constants import (
 from dive_utils.types import AvailableJobSchema, PipelineDescription
 
 from .pipelines import load_pipelines, run_pipeline
-from .serializers import meva as meva_serializer
+from .serializers.kpf import meva as meva_serializer
 from .training import ensure_csv_detections_file, training_output_folder
 from .transforms import GetPathFromItemId
 from .utils import (
