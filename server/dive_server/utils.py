@@ -310,7 +310,7 @@ def get_annotation_csv_generator(
         imageFiles = [img['name'] for img in valid_images(folder, user)]
 
     thresholds = fromMeta(folder, "confidenceFilters", {})
-    annotation_file = detections_file(folder, strict=True)
+    annotation_file = detections_file(folder, strict=False)
     track_dict = getTrackData(annotation_file)
     typeFilterSet = set(typeFilter)
 
