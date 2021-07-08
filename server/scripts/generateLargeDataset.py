@@ -1,24 +1,21 @@
-import argparse
 import glob
 import json
-import math
 import os
 import random
 import subprocess as sp
 
 import cv2
 import numpy as np
-from PIL import Image
 from tqdm import tqdm
 
 
-def create_video(args):
-    directory = args.directory
-    width = args.width
-    height = args.height
-    fps = args.fps
-    frames = args.frames
-
+def create_video(
+    directory: str,
+    width: int,
+    height: int,
+    fps: int,
+    frames: int,
+):
     os.mkdir(directory)
 
     for i in tqdm(range(int(frames))):
@@ -44,17 +41,18 @@ def create_video(args):
         os.remove(filePath)
 
 
-def create_track_json(args):
+def create_track_json(
+    directory: str,
+    image_count: int,
+    track_count: int,
+    type_count: int,
+    max_track_length: int,
+    width: int,
+    height: int,
+):
     """
     Read in JSON file and video file and extract bounds and create files for all the other data
     """
-    directory = args.directory
-    image_count = int(args.images)
-    track_count = int(args.tracks)
-    type_count = int(args.types)
-    max_track_length = int(args.track_length)
-    width = int(args.width)
-    height = int(args.height)
     types = []
     for type in range(type_count):
         types.append(f"Type_{type}")
@@ -97,43 +95,14 @@ def create_track_json(args):
         json.dump(tracks, outfile)
 
 
-def create_images(args):
+def create_images(
+    directory: str,
+    images: int,
+    width: int,
+    height: int,
+):
     # Create a folder to hold it
-    directory = args.directory
-    number = int(args.images)
-    width = int(args.width)
-    height = int(args.height)
     os.mkdir(directory)
-    for index in tqdm(range(number)):
+    for index in tqdm(range(images)):
         img = np.random.randint(0, 255, (height, width), np.uint8)
         cv2.imwrite(f"{directory}/image_{index}.jpg", img)
-
-
-def main(args):
-    if args.video is False:
-        create_images(args)
-    else:
-        create_video(args)
-    create_track_json(args)
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Create Large Dataset")
-
-    parser.add_argument("--images", default=100, help="Number of Images")
-    parser.add_argument("--video", default=False, help="Video Support")
-    parser.add_argument("--frames", default=100, help="Video Frames")
-    parser.add_argument("--width", default=10, help="Video Frames")
-    parser.add_argument("--height", default=10, help="Video Frames")
-    parser.add_argument("--fps", default=1, help="Video Frames")
-    parser.add_argument("--tracks", default=100, help="Number of Tracks")
-    parser.add_argument("--types", default=10, help="Number of Types")
-    parser.add_argument("--track_length", default=1, help="Max Track Length")
-    parser.add_argument("--directory", default="./dataset", help="outputDirectory")
-
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    args = parse_args()
-    main(args)

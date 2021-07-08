@@ -31,6 +31,7 @@ dev_requirements = [
     "pytest",
     "ipykernel",
     "tabulate",
+    "opencv-python",
     "python-dotenv",
     "pytest-cov",
     "tox",
