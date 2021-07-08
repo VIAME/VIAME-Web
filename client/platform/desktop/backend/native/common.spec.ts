@@ -416,6 +416,7 @@ describe('native.common', () => {
       datasetIds: ['randomID'],
       pipelineName: 'trainedPipelineName',
       trainingConfig: 'trainingConfig',
+      annotatedFramesOnly: false,
     };
     const contents = await common.processTrainedPipeline(settings, trainingArgs, '/home/user/viamedata/DIVE_Jobs/goodTrainingJob/');
     expect(contents).toEqual(['detector.pipe', 'trained_detector.zip']);
@@ -435,6 +436,7 @@ describe('native.common', () => {
       datasetIds: ['randomID'],
       pipelineName: 'trainedBadPipelineName',
       trainingConfig: 'trainingConfig',
+      annotatedFramesOnly: false,
     };
     expect(common.processTrainedPipeline(settings, trainingArgs, '/home/user/viamedata/DIVE_Jobs/badTrainingJob/')).rejects.toThrow(
       'Path: /home/user/viamedata/DIVE_Jobs/badTrainingJob/category_models does not exist',

@@ -105,7 +105,9 @@ interface Api {
   runPipeline(itemId: string, pipeline: Pipe): Promise<unknown>;
 
   getTrainingConfigurations(): Promise<TrainingConfigs>;
-  runTraining(folderIds: string[], pipelineName: string, config: string): Promise<unknown>;
+  runTraining(
+    folderIds: string[], pipelineName: string, config: string, annotatedFramesOnly: boolean
+  ): Promise<unknown>;
 
   loadMetadata(datasetId: string): Promise<DatasetMeta>;
   loadDetections(datasetId: string): Promise<MultiTrackRecord>;

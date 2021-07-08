@@ -29,6 +29,7 @@ export default defineComponent({
 
     const trainingConfigurations = ref<TrainingConfigs | null>(null);
     const selectedTrainingConfig = ref<string | null>(null);
+    const annotatedFramesOnly = ref<boolean>(true);
 
     onBeforeMount(async () => {
       const resp = await getTrainingConfigurations();
@@ -54,6 +55,7 @@ export default defineComponent({
           props.selectedDatasetIds,
           trainingOutputName.value,
           selectedTrainingConfig.value,
+          annotatedFramesOnly.value,
         );
 
         menuOpen.value = false;
@@ -83,6 +85,7 @@ export default defineComponent({
     return {
       trainingConfigurations,
       selectedTrainingConfig,
+      annotatedFramesOnly,
       trainingOutputName,
       menuOpen,
       trainingDisabled,
@@ -164,6 +167,14 @@ export default defineComponent({
             class="my-4"
             label="Configuration File"
             :items="trainingConfigurations.configs"
+          />
+          <v-checkbox
+            v-model="annotatedFramesOnly"
+            label="Use annotated frames only"
+            dense
+            hint="Train only on frames with groundtruth and ignore frames without annotations"
+            persistent-hint
+            class="pt-0"
           />
           <v-btn
             depressed

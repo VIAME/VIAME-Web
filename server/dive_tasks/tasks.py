@@ -316,6 +316,7 @@ def train_pipeline(
     groundtruth_list: List[GirderModel],
     pipeline_name: str,
     config: str,
+    annotatedFramesOnly: bool = False,
 ):
     """
     Train a pipeline by making a call to viame_train_detector

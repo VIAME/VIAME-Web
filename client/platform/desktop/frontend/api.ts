@@ -79,12 +79,13 @@ async function runPipeline(itemId: string, pipeline: Pipe): Promise<DesktopJob> 
 }
 
 async function runTraining(
-  folderIds: string[], pipelineName: string, config: string,
+  folderIds: string[], pipelineName: string, config: string, annotatedFramesOnly: boolean,
 ): Promise<DesktopJob> {
   const args: RunTraining = {
     datasetIds: folderIds,
     pipelineName,
     trainingConfig: config,
+    annotatedFramesOnly,
   };
   return ipcRenderer.invoke('run-training', args);
 }

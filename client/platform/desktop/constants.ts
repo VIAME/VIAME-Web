@@ -130,6 +130,8 @@ export interface RunTraining {
   pipelineName: string;
   // training configuration file name
   trainingConfig: string;
+  // train only on annotated frames
+  annotatedFramesOnly: boolean;
 }
 
 export interface ConversionArgs {

@@ -111,6 +111,11 @@ const { argv } = yargs
     yargs.option('name', {
       describe: 'New pipeline name created by training',
     });
+    yargs.option('annotatedFramesOnly', {
+      describe: 'Train only on annotated frames',
+      type: 'boolean',
+      default: false,
+    });
     yargs.demandOption(['id', 'config', 'name']);
   })
   .command('stats', 'Show stats on existing data', () => {
@@ -165,6 +170,7 @@ if (argv._.includes('viame2json')) {
     datasetIds: argv.id as string[],
     trainingConfig: argv.config as string,
     pipelineName: argv.name as string,
+    annotatedFramesOnly: argv.annotatedFramesOnly as boolean,
   };
   const run = async () => {
     const job = await settings.platform.train(settings, trainargs, updater);

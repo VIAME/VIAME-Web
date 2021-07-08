@@ -40,6 +40,7 @@ export default defineComponent({
         configs: [],
         default: '',
       } as TrainingConfigs,
+      annotatedFramesOnly: true,
     });
 
     const headersTmpl: DataTableHeader[] = [
@@ -97,6 +98,7 @@ export default defineComponent({
           stagedItems.value.map(({ id }) => id),
           data.trainingOutputName,
           data.selectedTrainingConfig,
+          data.annotatedFramesOnly,
         );
         root.$router.push({ name: 'jobs' });
       } catch (err) {
@@ -157,7 +159,7 @@ export default defineComponent({
       <v-card-text>
         Add datasets to the staging area and choose a training configuration.
       </v-card-text>
-      <v-row class="my-4">
+      <v-row class="mt-4 pt-0">
         <v-col sm="5">
           <v-text-field
             v-model="data.trainingOutputName"
@@ -198,6 +200,14 @@ export default defineComponent({
         </template>
       </v-data-table>
       <div class="d-flex flex-row mt-7">
+        <v-checkbox
+          v-model="data.annotatedFramesOnly"
+          label="Use annotated frames only"
+          dense
+          hint="Train only on frames with groundtruth and ignore frames without annotations"
+          persistent-hint
+          class="py-0 my-0"
+        />
         <v-spacer />
         <v-btn
           :disabled="!isReadyToTrain"

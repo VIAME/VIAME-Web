@@ -106,8 +106,12 @@ async function getTrainingConfigurations(): Promise<TrainingConfigs> {
   return data;
 }
 
-function runTraining(folderIds: string[], pipelineName: string, config: string) {
-  return girderRest.post('/viame/train', folderIds, { params: { pipelineName, config } });
+function runTraining(
+  folderIds: string[], pipelineName: string, config: string, annotatedFramesOnly: boolean,
+) {
+  return girderRest.post('/viame/train', folderIds, {
+    params: { pipelineName, config, annotatedFramesOnly },
+  });
 }
 
 function saveMetadata(folderId: string, metadata: DatasetMetaMutable) {
