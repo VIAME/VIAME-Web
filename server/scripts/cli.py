@@ -1,9 +1,11 @@
+import csv
 import json
 from typing import BinaryIO, Dict
 
 import click
 
 from dive_utils import models
+from dive_server.serializers import kwcoco, viame
 from scripts import generateLargeDataset
 
 
@@ -50,3 +52,35 @@ def main(
         width,
         height,
     )
+
+
+@cli.group(name="convert")
+@click.version_option()
+def convert():
+    pass
+
+
+@convert.command(name="coco2dive")
+@click.argument('input', type=click.File('rb'))
+@click.option('--output', type=click.File('wt'), default='result.json')
+@click.option('--output-attrs', type=click.File('wt'), default='attributes.json')
+def convert_coco(input, output, output_attrs):
+    coco_json = json.load(input)
+    tracks, attributes = kwcoco.load_coco_as_tracks_and_attributes(coco_json)
+    json.dump(tracks, output, indent=4)
+    json.dump(attributes, output_attrs, indent=4)
+    click.echo(f'wrote output {output.name}')
+    click.echo(f'wrote attrib {output_attrs.name}')
+
+
+@convert.command(name="viame2dive")
+@click.argument('input', type=click.File('rt'))
+@click.option('--output', type=click.File('wt'), default='result.json')
+@click.option('--output-attrs', type=click.File('wt'), default='attributes.json')
+def convert_viame_csv(input, output, output_attrs):
+    rows = input.readlines()
+    tracks, attributes = viame.load_csv_as_tracks_and_attributes(rows)
+    json.dump(tracks, output, indent=4)
+    json.dump(attributes, output_attrs, indent=4)
+    click.echo(f'wrote output {output.name}')
+    click.echo(f'wrote attrib {output_attrs.name}')
