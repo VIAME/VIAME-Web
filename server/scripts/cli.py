@@ -4,8 +4,8 @@ from typing import BinaryIO, Dict
 
 import click
 
-from dive_utils import models
 from dive_server.serializers import kwcoco, viame
+from dive_utils import models
 from scripts import generateLargeDataset
 
 
