@@ -1,0 +1,10 @@
+Below is a command that can be used to create some highquality gifs for demos
+
+ffmpeg -i input.mp4 -vf "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+
+Speed up a video by 0.5 and then smooth out the video after to convert to a gif
+ffmpeg -i input.mp4 -vf "setpts=0.1*PTS","fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+
+//impotant things are the setpts=0.1, and the smooting in minterpolate afterwards
+ffmpeg -i input.mp4 -vf "setpts=0.1*PTS","minterpolate='mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=30'","fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+

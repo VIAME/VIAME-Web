@@ -1,0 +1,1125 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for DIVE">
+      
+      
+      
+        <meta name="author" content="Kitware">
+      
+      
+        <link rel="canonical" href="https://kitware.github.io/dive/Web-Version/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>Web Version - DIVE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+  
+
+
+
+  
+  
+
+
+
+  <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-6042509-43","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){var e;this.value&&(e=document.location.pathname,ga("send","pageview",e+"?q="+this.value))}),"undefined"!=typeof location$&&location$.subscribe(function(e){ga("send","pageview",e.pathname)})})</script>
+  <script async src="https://www.google-analytics.com/analytics.js"></script>
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#web-version" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="DIVE" class="md-header__button md-logo" aria-label="DIVE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M327.1 96c-89.97 0-168.54 54.77-212.27 101.63L27.5 131.58c-12.13-9.18-30.24.6-27.14 14.66L24.54 256 .35 365.77c-3.1 14.06 15.01 23.83 27.14 14.66l87.33-66.05C158.55 361.23 237.13 416 327.1 416 464.56 416 576 288 576 256S464.56 96 327.1 96zm87.43 184c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24 13.26 0 24 10.74 24 24 0 13.25-10.75 24-24 24z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DIVE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Web Version
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/Kitware/dive/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="DIVE" class="md-nav__button md-logo" aria-label="DIVE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M327.1 96c-89.97 0-168.54 54.77-212.27 101.63L27.5 131.58c-12.13-9.18-30.24.6-27.14 14.66L24.54 256 .35 365.77c-3.1 14.06 15.01 23.83 27.14 14.66l87.33-66.05C158.55 361.23 237.13 416 327.1 416 464.56 416 576 288 576 256S464.56 96 327.1 96zm87.43 184c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24 13.26 0 24 10.74 24 24 0 13.25-10.75 24-24 24z"/></svg>
+
+    </a>
+    DIVE
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/Kitware/dive/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Screenshots/" class="md-nav__link">
+        Screenshots
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Web Version
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Web Version
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#register-for-an-account" class="md-nav__link">
+    Register for an account
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uploading-data" class="md-nav__link">
+    Uploading data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#downloading-data" class="md-nav__link">
+    Downloading Data
+  </a>
+  
+    <nav class="md-nav" aria-label="Downloading Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#annotation-folder-structure" class="md-nav__link">
+    Annotation Folder Structure
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-browser-data-download" class="md-nav__link">
+    File Browser Data Download
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#annotation-viewer-download" class="md-nav__link">
+    Annotation Viewer Download
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trained-model-downloads" class="md-nav__link">
+    Trained model downloads
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-data-with-teams" class="md-nav__link">
+    Sharing data with teams
+  </a>
+  
+    <nav class="md-nav" aria-label="Sharing data with teams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    Concepts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-with-teams" class="md-nav__link">
+    Working with teams
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-permissions" class="md-nav__link">
+    Managing Permissions
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#granting-access-to-others" class="md-nav__link">
+    Granting access to others
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-urls" class="md-nav__link">
+    Sharing URLs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-clones" class="md-nav__link">
+    Dataset Clones
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Clones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clone-use-cases" class="md-nav__link">
+    Clone use cases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-clone" class="md-nav__link">
+    How to clone
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Dive-Desktop/" class="md-nav__link">
+        Desktop Version
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Annotation-QuickStart/" class="md-nav__link">
+        Annotation Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Mouse-Keyboard-Shortcuts/" class="md-nav__link">
+        Mouse and Keyboard Shortcuts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Pipeline-Documentation/" class="md-nav__link">
+        Pipelines & Training
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      <label class="md-nav__link" for="__nav_8">
+        Annotation Interface Guide
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Annotation Interface Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Annotation Interface Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Annotation-User-Interface-Overview/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Navigation-Bar/" class="md-nav__link">
+        Navigation Bar
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Edit-Bar/" class="md-nav__link">
+        Edit Bar
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Annotation-View/" class="md-nav__link">
+        Annotation View
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Type-List/" class="md-nav__link">
+        Type List
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Track-List/" class="md-nav__link">
+        Track List
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UI-Interpolation/" class="md-nav__link">
+        Interpolation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Attributes/" class="md-nav__link">
+        Attributes
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Google-Cloud/" class="md-nav__link">
+        Google Cloud Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      <label class="md-nav__link" for="__nav_10">
+        Advanced features
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Advanced features" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          Advanced features
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Pipeline-Upload/" class="md-nav__link">
+        Custom Pipeline Upload
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Command-Line-Tools/" class="md-nav__link">
+        Command Line Tools
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Server-Operator/" class="md-nav__link">
+        Server Operator Guide
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        Frequently Asked Questions
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#register-for-an-account" class="md-nav__link">
+    Register for an account
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uploading-data" class="md-nav__link">
+    Uploading data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#downloading-data" class="md-nav__link">
+    Downloading Data
+  </a>
+  
+    <nav class="md-nav" aria-label="Downloading Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#annotation-folder-structure" class="md-nav__link">
+    Annotation Folder Structure
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-browser-data-download" class="md-nav__link">
+    File Browser Data Download
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#annotation-viewer-download" class="md-nav__link">
+    Annotation Viewer Download
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trained-model-downloads" class="md-nav__link">
+    Trained model downloads
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-data-with-teams" class="md-nav__link">
+    Sharing data with teams
+  </a>
+  
+    <nav class="md-nav" aria-label="Sharing data with teams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    Concepts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-with-teams" class="md-nav__link">
+    Working with teams
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-permissions" class="md-nav__link">
+    Managing Permissions
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#granting-access-to-others" class="md-nav__link">
+    Granting access to others
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-urls" class="md-nav__link">
+    Sharing URLs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-clones" class="md-nav__link">
+    Dataset Clones
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Clones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clone-use-cases" class="md-nav__link">
+    Clone use cases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-clone" class="md-nav__link">
+    How to clone
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Kitware/dive/edit/master/docs/Web-Version.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="web-version">Web Version</h1>
+<p><a class="md-button md-button--primary" href="https://viame.kitware.com">Try our public server ➥</a></p>
+<p>You can also <a href="../Server-Operator/">run your own</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>VIAME Web is automatically updated at 2AM EST/EDT every Thursday.</strong></p>
+<p>If you are running a pipeline or training workflow during update, it will be interrupted and started over.</p>
+</div>
+<h2 id="features">Features</h2>
+<ul>
+<li>upload and download data</li>
+<li>permissions and sharing support for team collaboration</li>
+<li>image and video annotation</li>
+<li>pre-trained model pipeline execution</li>
+<li>multi-dataset model training</li>
+</ul>
+<h2 id="register-for-an-account">Register for an account</h2>
+<p>A user account is required to store data and run pipelines on viame.kitware.com.</p>
+<ol>
+<li>Visit <a href="https://viame.kitware.com">viame.kitware.com</a></li>
+<li>Click <strong>Register</strong></li>
+</ol>
+<h2 id="uploading-data">Uploading data</h2>
+<ul>
+<li>Open the DIVE Homepage, and navigate to the "Data" tab.</li>
+<li>Click the blue "user home" button at the top left of the data browser.</li>
+<li>Choose your "public" or "private" folder.</li>
+<li>Click the blue "Upload" button that appears in the toolbar.</li>
+<li>Select a video or multi-select a group of image frames.</li>
+<li>If you already have <code>annotations.csv</code>, select that too.</li>
+<li>Choose a name for the data, enter the optional video playback frame rate, and press start-upload.</li>
+<li>In the data browser, a new blue "Launch Annotator" button will appear next to your data.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>All video uploaded to the web server will be transcoded as <code>mp4/h264</code>.</p>
+</div>
+<h2 id="downloading-data">Downloading Data</h2>
+<p>After creating/modifying annotations or running pipelines the data may be exported through two methods:</p>
+<ul>
+<li>File Browser Data Download</li>
+<li>Annotation Viewer Download</li>
+</ul>
+<h3 id="annotation-folder-structure">Annotation Folder Structure</h3>
+<p>An annotation folder in DIVE will consist of three main components:</p>
+<ul>
+<li><strong>Source Data</strong> - The image-sequence files or video used in the annotation.</li>
+<li><strong>Detections File</strong> - The current detections/tracks for the annotation which are stored in either a CSV format or JSON</li>
+<li>After the first edit to a project, the data will be stored in JSON, when downloading the current detection it will <strong>always be downloaded in .csv format</strong></li>
+<li><strong>Auxiliary Folder</strong> - Backups of the detection file each time a save is done.</li>
+</ul>
+<h3 id="file-browser-data-download">File Browser Data Download</h3>
+<p>Data can be downloaded directly from the FileBrowser by clicking the checkmark to the left of a folder.  This allows you to download the source images/video, the current detection file converted to .csv or everything including all backups of the detection files.  </p>
+<p><strong>Filtered Detections</strong> - The ability to export detections/tracks based on the currently set confidence filter.  This will only export tracks/detections that are higher than the confidence filter set for the folder.  This can be adjusted through the UI interface within the Annotation Viewer.  For more information check:</p>
+<p><img alt="Placeholder" src="Type List | UI Type List" /></p>
+<p><img alt="Download Files" src="../images/FileBrowser/DownloadFiles.png" /></p>
+<h3 id="annotation-viewer-download">Annotation Viewer Download</h3>
+<p>Within the annotation viewer itself there is the option to download the same data in the file browser.</p>
+<p>These options are explained in <strong><a href="../UI-Navigation-Bar/">Navigation Bar</a></strong> UI Docs.</p>
+<h3 id="trained-model-downloads">Trained model downloads</h3>
+<p>You can download your trained models through the administrative interface.  This will be added to the normal interface in a future update.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Use caution when modifying data through the admin interface</p>
+</div>
+<ul>
+<li>Open the admin interface at <a href="https://viame.kitware.com/girder">https://viame.kitware.com/girder</a> (or <code>myserver.com/girder</code> if you host your own instance)</li>
+<li>Navigate to your personal workspace by clicking <code>My folders</code> under your user dropdown in the top right corner.<ul>
+<li><img alt="My Folders" src="../images/Girder/my_folders.png" /></li>
+</ul>
+</li>
+<li>Navigate to the <code>VIAME/VIAME Training Results</code> folder and into the folder you wish to download<ul>
+<li><img alt="Select All" src="../images/Girder/select_all.png" /></li>
+</ul>
+</li>
+<li>Select all items and download using the menu<ul>
+<li><img alt="Download" src="../images/Girder/download_selected.png" /></li>
+</ul>
+</li>
+</ul>
+<h2 id="sharing-data-with-teams">Sharing data with teams</h2>
+<p>This information will be relevant to teams where several people need to work on the same data.</p>
+<h3 id="concepts">Concepts</h3>
+<p>By default, data uploaded to your personal user space follows these conventions.</p>
+<ul>
+<li>Data in the <code>Public</code> folder is readable by all registered users, but writable only by you by default.</li>
+<li>Data in the <code>Private</code> folder is only visible to you by default.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>You can share your entire public or private folder with team members.</p>
+</div>
+<h3 id="working-with-teams">Working with teams</h3>
+<p>A common scenario is for a group to have a lot of shared data that several members should be able to view and annotate.</p>
+<p>For most teams, we recommend keeping data consolidated under a single account then following the sharing instructions below to make sure all team members have appropriate access.</p>
+<p>It's easiest to create a single parent directory to share and then put all individual datasets inside that parent.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You should note that 2 people <strong>cannot</strong> work on the same video at the same time.  Your team should coordianate on who will work on each dataset.</p>
+</div>
+<h2 id="managing-permissions">Managing Permissions</h2>
+<p>DIVE uses Girder's <a href="https://girder.readthedocs.io/en/latest/user-guide.html#permissions">Permissions Model</a>.</p>
+<p>There are four levels of permission a User can have on a resource.</p>
+<ul>
+<li>No permission (cannot view, edit, or delete a resource)</li>
+<li>READ permission (can view and download resources)</li>
+<li>WRITE permission (includes READ permission, can edit the properties of a resource)</li>
+<li>ADMIN also known as own permission, (includes READ and WRITE permission, can delete the resource and also control access on it)</li>
+</ul>
+<h3 id="granting-access-to-others">Granting access to others</h3>
+<ul>
+<li>Navigate to your data in the data browser.</li>
+<li>Right click a dataset folder or directory to share.</li>
+</ul>
+<p><img alt="Right Click Menu" src="../images/Sharing/RightClickMenu.png" /></p>
+<ul>
+<li>Search for and select users you want to grant permissions for.</li>
+<li>Select the correct permissions in the drop-down next to each user.</li>
+</ul>
+<p><img alt="Search For Users" src="../images/Sharing/SearchBar.png" /></p>
+<ul>
+<li><strong>Be sure to enable <code>Include subfolders</code> at the bottom of the dialog.</strong></li>
+</ul>
+<p><img alt="Toggle Include Subfolders" src="../images/Sharing/Toggles.png" /></p>
+<ul>
+<li>Click save.</li>
+</ul>
+<p>These users should now be able to view and edit your data.</p>
+<h2 id="sharing-urls">Sharing URLs</h2>
+<p>You can copy and paste any URL from the address bar and share with collaborators.  This includes folders in the data browser as well as direct links to the annotation editor.</p>
+<h2 id="dataset-clones">Dataset Clones</h2>
+<p>A clone is a <strong>shallow copy</strong> of a dataset.</p>
+<ul>
+<li>It has its own annotations, and can be run through pipelines and shared with others.</li>
+<li>It references the media (images or video) of another dataset.</li>
+</ul>
+<h3 id="clone-use-cases">Clone use cases</h3>
+<ol>
+<li>When you want to use or modify data that doesn't belong to you, such as data from the shared training collection or from other users.</li>
+<li>When you want to run several different pipelines in parallel on the same input data and compare the results.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Merging cloned data back to the source is <strong>not currently supported</strong>.  To collaborate with others on annotations, the sharing use case above is preferred.</p>
+</div>
+<h3 id="how-to-clone">How to clone</h3>
+<ul>
+<li>Open the dataset you wish to clone in the viewer.</li>
+<li>Click the <code>Clone</code> chip in the top toolbar next to the name</li>
+<li>Choose a name and location for the clone within your own workspace.</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../Screenshots/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Screenshots" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Screenshots
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../Dive-Desktop/" class="md-footer__link md-footer__link--next" aria-label="Next: Desktop Version" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Desktop Version
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>
