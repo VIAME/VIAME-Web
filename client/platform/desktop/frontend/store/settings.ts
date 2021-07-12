@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Install, { ref } from '@vue/composition-api';
+import Install, { Ref, ref } from '@vue/composition-api';
 import { ipcRenderer } from 'electron';
 import { Settings } from 'platform/desktop/constants';
 
@@ -8,7 +8,7 @@ Vue.use(Install);
 
 const SettingsKey = 'desktop.settings';
 
-const settings = ref({} as Settings);
+const settings: Ref<Settings | null> = ref(null);
 
 function getDefaultSettings(): Promise<Settings> {
   return ipcRenderer.invoke('default-settings');
@@ -48,9 +48,20 @@ async function init() {
   } catch {
     // pass
   }
+  // finally, override any user settings with the values that have been
+  // externally forced.
+  if (settingsvalue.overrides.viamePath !== undefined) {
+    settingsvalue.viamePath = settingsvalue.overrides.viamePath;
+  }
   settings.value = settingsvalue;
-
   ipcRenderer.send('update-settings', settings.value);
+}
+
+function getSettings(): Settings {
+  if (settings.value === null) {
+    throw new Error('Settings requested before initialization!');
+  }
+  return settings.value;
 }
 
 async function setSettings(s: Settings) {
@@ -63,6 +74,7 @@ init();
 
 export {
   settings,
+  getSettings,
   setSettings,
   validateSettings,
 };

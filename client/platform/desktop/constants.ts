@@ -14,6 +14,11 @@ export interface Settings {
   viamePath: string;
   // dataPath path to a userspace data directory
   dataPath: string;
+  // overrides for any values above
+  overrides: {
+    // overdide viamePath from enviroment
+    viamePath?: string;
+  };
 }
 
 // Handles Importing and storing of multi camera data

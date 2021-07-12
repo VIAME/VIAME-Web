@@ -21,9 +21,13 @@ const DefaultSettings: Settings = {
   // The current settings schema config
   version: SettingsCurrentVersion,
   // A path to the VIAME base install
-  viamePath: process.env.DIVE_VIAME_INSTALL_PATH || 'C:\\Program Files\\VIAME',
+  viamePath: 'C:\\Program Files\\VIAME',
   // Path to a user data folder
   dataPath: npath.join(os.homedir(), 'VIAME_DATA'),
+  // Overrides
+  overrides: {
+    viamePath: process.env.DIVE_VIAME_INSTALL_PATH || undefined,
+  }
 };
 
 const ViameWindowsConstants = {

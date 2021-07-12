@@ -17,7 +17,7 @@ import CompositionApi from '@vue/composition-api';
 
 import Track from 'vue-media-annotator/track';
 
-import { DesktopJobUpdate, RunPipeline, RunTraining } from 'platform/desktop/constants';
+import { DesktopJobUpdate, RunPipeline, RunTraining, Settings } from 'platform/desktop/constants';
 import { loadJsonTracks, loadJsonMetadata } from 'platform/desktop/backend/native/common';
 import linux from './native/linux';
 import win32 from './native/windows';
@@ -121,20 +121,24 @@ const { argv } = yargs
 
 function getSettings() {
   const platform = getCurrentPlatform();
-  return {
-    platform,
+  const settings: Settings = {
     ...platform.DefaultSettings,
     dataPath: argv.datapath as string || platform.DefaultSettings.dataPath,
     viamePath: argv.viamepath as string || platform.DefaultSettings.viamePath,
   };
+  return {
+    platform,
+    settings,
+  };
 }
+
+const { settings, platform } = getSettings();
 
 if (argv._.includes('viame2json')) {
   parseViameFile(argv.file as string);
 } else if (argv._.includes('json2viame')) {
   parseJsonFile(argv.file as string, argv.meta as string);
 } else if (argv._.includes('list-config')) {
-  const settings = getSettings();
   const run = async () => {
     const pipelines = await common.getPipelineList(settings);
     const trainingConfig = await common.getTrainingConfigs(settings);
@@ -145,7 +149,6 @@ if (argv._.includes('viame2json')) {
   };
   run();
 } else if (argv._.includes('run-pipeline')) {
-  const settings = getSettings();
   const pipeargs: RunPipeline = {
     datasetId: argv.id as string,
     pipeline: {
@@ -155,25 +158,23 @@ if (argv._.includes('viame2json')) {
     },
   };
   const run = async () => {
-    const job = await settings.platform.runPipeline(settings, pipeargs, updater);
+    const job = await platform.runPipeline(settings, pipeargs, updater);
     stdout.write(JSON.stringify(job, undefined, 2));
   };
   run();
 } else if (argv._.includes('run-training')) {
-  const settings = getSettings();
   const trainargs: RunTraining = {
     datasetIds: argv.id as string[],
     trainingConfig: argv.config as string,
     pipelineName: argv.name as string,
   };
   const run = async () => {
-    const job = await settings.platform.train(settings, trainargs, updater);
+    const job = await platform.train(settings, trainargs, updater);
     stdout.write(JSON.stringify(job, undefined, 2));
   };
   run();
 } else if (argv._.includes('stats')) {
   Vue.use(CompositionApi); // needed for Track hydration.
-  const settings = getSettings();
   const dspath = npath.join(settings.dataPath, common.ProjectsFolderName);
   const run = async () => {
     const dsids = await fs.readdir(dspath);
