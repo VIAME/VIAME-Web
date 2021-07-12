@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+from pydantic.types import ConstrainedInt, conlist
 from typing_extensions import Literal
 
 
@@ -42,6 +43,23 @@ class Track(BaseModel):
     features: List[Feature] = Field(default_factory=lambda: [])
     confidencePairs: List[Tuple[str, float]] = Field(default_factory=lambda: [])
     attributes: Dict[str, Any] = Field(default_factory=lambda: {})
+
+    @validator('features')
+    def validateFeatures(cls, v: List[Feature], values: dict):
+        if len(v) > 0:
+            trackId = values.get('trackId')
+            begin = values.get('begin')
+            end = values.get('end')
+            print(trackId, begin, end)
+            if v[0].frame != begin:
+                raise ValueError(
+                    f'trackId={trackId} begin={begin} does not match features[0]={v[0].frame}'
+                )
+            if v[-1].frame != end:
+                raise ValueError(
+                    f'trackId={trackId} end={end} does not match features[-1]={v[-1].frame}'
+                )
+        return v
 
     def exceeds_thresholds(self, thresholds: Dict[str, float]) -> bool:
         defaultThresh = thresholds.get('default', 0)
