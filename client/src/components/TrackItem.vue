@@ -138,8 +138,14 @@ export default defineComponent({
       data.skipOnFocus = false;
     }
 
+    const keyframeDisabled = computed(() => (
+      !feature.value.real && !feature.value.shouldInterpolate)
+      || (props.track.length === 1 && frameRef.value === props.track.begin));
+
     function toggleKeyframe() {
-      props.track.toggleKeyframe(frameRef.value);
+      if (!keyframeDisabled.value) {
+        props.track.toggleKeyframe(frameRef.value);
+      }
     }
 
     function toggleInterpolation() {
@@ -183,6 +189,7 @@ export default defineComponent({
       typeInputBoxRef,
       frame: frameRef,
       allTypes: allTypesRef,
+      keyframeDisabled,
       /* methods */
       blurType,
       focusType,
@@ -314,7 +321,7 @@ export default defineComponent({
           :icon="(feature.isKeyframe)
             ? 'mdi-star'
             : 'mdi-star-outline'"
-          :disabled="!feature.real && !feature.shouldInterpolate"
+          :disabled="keyframeDisabled"
           tooltip-text="Toggle keyframe"
           @click="toggleKeyframe"
         />

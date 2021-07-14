@@ -262,6 +262,21 @@ describe('Track', () => {
     expect(t.begin).toEqual(6);
     expect(t.getFeature(12)[0]?.bounds).toEqual([150, 150, 150, 150]);
     expect(t.getFeature(12)[0]?.keyframe).toEqual(true);
+    // toggleKeyframe on a single feature expect error
+    t.deleteFeature(18);
+    t.deleteFeature(12);
+    expect(t.begin).toEqual(t.end);
+    expect(() => t.toggleKeyframe(t.begin)).toThrow('This is the only keyframe in Track:1 it cannot be removed');
+    // Turn off interpolation
+    t.toggleKeyframe(12);
+    expect(t.getFeature(12)[0]?.keyframe).toEqual(true);
+    expect(t.getFeature(8)[1]?.frame).toEqual(6);
+    expect(t.getFeature(8)[2]?.frame).toEqual(12);
+    // Remove lower keyframe
+    t.toggleKeyframe(6);
+    // Now try to remove remaining keyframe
+    expect(t.begin).toEqual(t.end);
+    expect(() => t.toggleKeyframe(12)).toThrow('This is the only keyframe in Track:1 it cannot be removed');
   });
 });
 
