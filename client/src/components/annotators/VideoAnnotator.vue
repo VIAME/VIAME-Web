@@ -42,8 +42,11 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    originalFps: {
+      type: Number,
+      required: true,
+    },
   },
-
 
   setup(props, { emit }) {
     const commonMedia = useMediaController({ emit });
@@ -84,11 +87,39 @@ export default defineComponent({
     }
 
     async function seek(frame: number) {
-      // ref: PTS precision note above
-      video.currentTime = (frame / props.frameRate) + OnePTSTick;
-      data.frame = Math.round(video.currentTime * props.frameRate);
+      /**
+       * requestedTime is the position, in seconds, that was
+       * requested for seek
+       */
+      const requestedTime = frame / props.frameRate;
+      /**
+       * RequestedTrueVideoFrame is the floating point frame number
+       * expected to be found at requested time
+       */
+      const requestedTrueVideoFrame = requestedTime * props.originalFps;
+      /**
+       * trueFrameWidth is the width, in seconds, of a real video frame
+       */
+      const trueFrameWidth = 1 / props.originalFps;
+      /**
+       * lastTrueFrameBoundary is the time, in seconds, of the
+       * previous frame transition boundary
+       */
+      const lastTrueFrameBoundary = (
+        Math.floor(requestedTrueVideoFrame) / props.originalFps
+      );
+
+      if (requestedTime - lastTrueFrameBoundary > (trueFrameWidth / 2)) {
+        // if we are more than halfway past the last boundary
+        data.currentTime = lastTrueFrameBoundary + trueFrameWidth + OnePTSTick;
+      } else {
+        data.currentTime = lastTrueFrameBoundary + OnePTSTick;
+      }
+
+      video.currentTime = data.currentTime;
+      data.trueVideoFrame = data.currentTime * props.originalFps;
+      data.frame = Math.round(data.currentTime * props.frameRate);
       commonMedia.emitFrame();
-      data.currentTime = video.currentTime;
     }
 
     function pause() {

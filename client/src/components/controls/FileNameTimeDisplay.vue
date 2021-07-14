@@ -11,7 +11,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { currentTime, duration, filename } = injectMediaController();
+    const {
+      currentTime, duration, filename, frame, trueVideoFrame,
+    } = injectMediaController();
     const display = computed(() => {
       if (props.displayType === 'filename') {
         return filename.value;
@@ -22,6 +24,9 @@ export default defineComponent({
     });
     return {
       display,
+      frame,
+      trueVideoFrame,
+      currentTime,
     };
   },
 });
@@ -29,6 +34,11 @@ export default defineComponent({
 
 <template>
   <span>
-    {{ display }}
+    <span>
+      {{ display }}
+    </span>
+    <span class="border-radius mr-1">frame {{ frame }}</span>
+    <span class="border-radius mr-1">real {{ trueVideoFrame.toFixed(3) }}</span>
+    <span class="border-radius">ts {{ currentTime.toFixed(6) }}</span>
   </span>
 </template>

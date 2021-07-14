@@ -77,6 +77,7 @@ export default defineComponent({
       return {} as MediaController;
     });
     const frameRate = ref(null as number | null);
+    const originalFps = ref(null as number | null);
     const imageData = ref([] as FrameImage[]);
     const datasetType: Ref<DatasetType> = ref('image-sequence');
     const datasetName = ref('');
@@ -310,6 +311,7 @@ export default defineComponent({
           populateConfidenceFilters(meta.confidenceFilters);
           datasetName.value = meta.name;
           frameRate.value = meta.fps;
+          originalFps.value = meta.originalFps;
           imageData.value = cloneDeep(meta.imageData) as FrameImage[];
           videoUrl.value = meta.videoUrl;
           datasetType.value = meta.type as DatasetType;
@@ -401,6 +403,7 @@ export default defineComponent({
       eventChartData,
       frame,
       frameRate,
+      originalFps,
       imageData,
       lineChartData,
       loadError,
@@ -508,7 +511,7 @@ export default defineComponent({
             { bind: 'r', handler: () => mediaController.resetZoom() },
             { bind: 'esc', handler: () => handler.trackAbort() },
           ]"
-          v-bind="{ imageData, videoUrl, frameRate }"
+          v-bind="{ imageData, videoUrl, frameRate, originalFps }"
           class="playback-component"
           @frame-update="frame = $event"
         >
